@@ -27,7 +27,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\vertex_core.glsl" />
-    <None Include="assets\fragment_core.glsl" />
+    <None Include="assets\fragment_core1.glsl" />
     <None Include="glfw3.dll" />
+    <None Include="assets\fragment_core2.glsl" />
   </ItemGroup>
 </Project>
