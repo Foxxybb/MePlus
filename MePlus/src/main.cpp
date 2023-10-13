@@ -14,12 +14,17 @@
 
 #include "Shader.h"
 
+#include "io/Keyboard.h"
+#include "io/Mouse.h"
+
 using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
 float mixVal = 0.5f;
+
+glm::mat4 transform = glm::mat4(1.0f);
 
 GLenum glCheckError_(const char* file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__);
@@ -65,8 +70,16 @@ int main() {
     // Set the dimensions of the viewport
     glViewport(0, 0, 800, 600);
 
+    // CALLBACKS
+
     // Set the callback for the window if it gets resized
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    glfwSetKeyCallback(window, Keyboard::keyCallback);
+
+    glfwSetCursorPosCallback(window, Mouse::cursorPosCallback);
+    glfwSetMouseButtonCallback(window, Mouse::mouseButtonCallback);
+    glfwSetScrollCallback(window, Mouse::mouseWheelCallback);
 
     // Shaders
     Shader shader("assets/vertex_core.glsl", "assets/fragment_core.glsl");
@@ -171,6 +184,8 @@ int main() {
     shader2.setMat4("transform", trans);*/
 
 
+    
+
     // MAIN LOOP
     while (!glfwWindowShouldClose(window))
     {
@@ -188,14 +203,15 @@ int main() {
         // draw shapes
         glBindVertexArray(VAO);
         shader.activate();
-        shader.setFloat("mixVal", mixVal);
-
+        
         //float timeValue = glfwGetTime();
 
         //// rotate continuous
         //trans = glm::rotate(trans, glm::radians((float)glfwGetTime() / 100.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         //shader.activate();
-        //shader.setMat4("transform", trans);
+        
+        shader.setFloat("mixVal", mixVal);
+        shader.setMat4("transform", transform);
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -249,21 +265,33 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 
 void processInput(GLFWwindow* window)
-{
+{   
     // if ESC key is pressed, close window
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (Keyboard::key(GLFW_KEY_ESCAPE)) {
         glfwSetWindowShouldClose(window, true);
+    }
 
     // change mixValue
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+    if (Keyboard::key(GLFW_KEY_UP)) {
         mixVal += 0.05f;
+        if (mixVal > 1) { mixVal = 1; }
     }
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+    if (Keyboard::key(GLFW_KEY_DOWN)) {
         mixVal -= 0.05f;
+        if (mixVal < 0) { mixVal = 0; }
     }
 
-    // value clamp
-    if (mixVal > 1) { mixVal = 1; }
-    if (mixVal < 0) { mixVal = 0; }
+    if (Keyboard::key(GLFW_KEY_W)) {
+        transform = glm::translate(transform, glm::vec3(0.0f, 0.1f, 0.0f));
+    }
+    if (Keyboard::key(GLFW_KEY_S)) {
+        transform = glm::translate(transform, glm::vec3(0.0f, -0.1f, 0.0f));
+    }
+    if (Keyboard::key(GLFW_KEY_A)) {
+        transform = glm::translate(transform, glm::vec3(-0.1f, 0.0f, 0.0f));
+    }
+    if (Keyboard::key(GLFW_KEY_D)) {
+        transform = glm::translate(transform, glm::vec3(0.1f, 0.0f, 0.0f));
+    }
 }
 
