@@ -1,6 +1,7 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <stb/stb_image.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -17,6 +18,9 @@ using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+
+float mixVal = 0.5f;
+
 GLenum glCheckError_(const char* file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__);
 
@@ -69,11 +73,11 @@ int main() {
     Shader shader2("assets/vertex_core.glsl", "assets/fragment_core2.glsl");
 
     float vertices[] = {
-        // positions            colors    
-        -0.25f, -0.5f, 0.0f,     1.0f, 1.0f, 0.5f,
-         0.15f,  0.0f, 0.0f,     0.5f, 1.0f, 0.75f,
-         0.0f,   0.5f, 0.0f,     0.6f, 1.0f, 0.2f,
-         0.5f,  -0.4f, 0.0f,     1.0f, 0.2f, 1.0f
+        // positions            colors              texturecoords
+        -0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 0.5f,   0.0f, 0.0f,
+        -0.5f,  0.5f, 0.0f,     0.5f, 1.0f, 0.75f,  0.0f, 1.0f,
+         0.5f, -0.5f, 0.0f,     0.6f, 1.0f, 0.2f,   1.0f, 0.0f,
+         0.5f,  0.5f, 0.0f,     1.0f, 0.2f, 1.0f,   1.0f, 1.0f
     };
     unsigned int indices[] = {
         0,1,2, // first tri
@@ -95,11 +99,57 @@ int main() {
 
     // set attribute pointers
     // positions
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     // color
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+    // texture coords
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    // TEXTURES
+    unsigned int texture1, texture2;
+
+    glGenTextures(1, &texture1);
+    glBindTexture(GL_TEXTURE_2D, texture1);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    // load image (JPG)
+    int width, height, nChannels;
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* data = stbi_load("assets/ket.jpg", &width, &height, &nChannels, 0);
+
+    if (data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    } else {
+        cout << "Failed to load texture" << endl;
+    }
+
+    stbi_image_free(data);
+
+    // load another image (PNG)
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
+
+    data = stbi_load("assets/ket2.png", &width, &height, &nChannels, 0);
+
+    if (data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    } else {
+        cout << "Failed to load texture" << endl;
+    }
+
+    shader.activate();
+    shader.setInt("texture1", 0);
+    shader.setInt("texture2", 1);
 
     // set eup EBO
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -110,15 +160,15 @@ int main() {
     glCheckError();
 
     glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::rotate(trans, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    trans = glm::rotate(trans, glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     shader.activate();
     shader.setMat4("transform", trans);
 
-    glm::mat4 trans2 = glm::mat4(1.0f);
+    /*glm::mat4 trans2 = glm::mat4(1.0f);
     trans2 = glm::scale(trans2, glm::vec3(1.5f));
     trans2 = glm::rotate(trans2, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
     shader2.activate();
-    shader2.setMat4("transform", trans);
+    shader2.setMat4("transform", trans);*/
 
 
     // MAIN LOOP
@@ -130,22 +180,31 @@ int main() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // gray screen
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // rotate continuous
-        trans = glm::rotate(trans, glm::radians((float)glfwGetTime() / 100.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        shader.activate();
-        shader.setMat4("transform", trans);
+        glActiveTexture(GL_TEXTURE0); // activates current unit
+        glBindTexture(GL_TEXTURE_2D, texture1); // binds texture to active unit
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
         
         // draw shapes
         glBindVertexArray(VAO);
         shader.activate();
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, 0);
+        shader.setFloat("mixVal", mixVal);
 
-        trans2 = glm::rotate(trans2, glm::radians((float)glfwGetTime() / -100.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        //float timeValue = glfwGetTime();
+
+        //// rotate continuous
+        //trans = glm::rotate(trans, glm::radians((float)glfwGetTime() / 100.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        //shader.activate();
+        //shader.setMat4("transform", trans);
+
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        /*trans2 = glm::rotate(trans2, glm::radians((float)glfwGetTime() / -100.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         shader2.activate();
         shader2.setMat4("transform", trans2);
 
         shader2.activate();
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3 * sizeof(GLuint)));
+        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3 * sizeof(GLuint)));*/
 
 
         // send new frame to window
@@ -194,5 +253,17 @@ void processInput(GLFWwindow* window)
     // if ESC key is pressed, close window
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    // change mixValue
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+        mixVal += 0.05f;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        mixVal -= 0.05f;
+    }
+
+    // value clamp
+    if (mixVal > 1) { mixVal = 1; }
+    if (mixVal < 0) { mixVal = 0; }
 }
 
