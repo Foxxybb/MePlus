@@ -132,6 +132,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\io\Camera.cpp" />
     <ClCompile Include="src\io\Mouse.cpp" />
     <ClCompile Include="src\io\Keyboard.cpp" />
     <ClCompile Include="lib\stb.cpp" />
@@ -146,6 +147,7 @@
     <None Include="glfw3.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\io\Camera.h" />
     <ClInclude Include="src\io\Mouse.h" />
     <ClInclude Include="src\io\Keyboard.h" />
     <ClInclude Include="src\Shader.h" />

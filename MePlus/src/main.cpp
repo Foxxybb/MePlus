@@ -16,15 +16,24 @@
 
 #include "io/Keyboard.h"
 #include "io/Mouse.h"
+#include "io/Camera.h"
 
 using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+void processInput(GLFWwindow* window, double dt);
 
 float mixVal = 0.5f;
 
 glm::mat4 transform = glm::mat4(1.0f);
+
+Camera camera(glm::vec3(0.0f, 0.0f, 3.0f));
+float deltaTime = 0.0f;
+float lastFrame = 0.0f;
+
+unsigned int SCR_WIDTH = 800, SCR_HEIGHT = 600;
+float x, y, z;
+float theta = 45.0f;
 
 GLenum glCheckError_(const char* file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__);
@@ -35,15 +44,6 @@ int main() {
     int success;
     char infoLog[512];
 
-    // GLM Test
-    //glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-    //glm::mat4 trans = glm::mat4(1.0f); // identity matrix
-    //trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f)); // translation
-    //trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-    //trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));
-    //vec = trans * vec;
-    //std::cout << vec.x << ' ' << vec.y << ' ' << vec.z << std::endl;
-
     // initiate openGL version 3.3
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -51,7 +51,7 @@ int main() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // create a window object
-    GLFWwindow* window = glfwCreateWindow(800, 600, "MePlus", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "MePlus", NULL, NULL);
     if (window == NULL)
     {
         std::cout << "Could not create window." << std::endl;
@@ -68,10 +68,9 @@ int main() {
     }
 
     // Set the dimensions of the viewport
-    glViewport(0, 0, 800, 600);
+    glViewport(0, 0, SCR_WIDTH, SCR_HEIGHT);
 
-    // CALLBACKS
-
+    // CALLBACKS==================================================================
     // Set the callback for the window if it gets resized
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
@@ -81,27 +80,64 @@ int main() {
     glfwSetMouseButtonCallback(window, Mouse::mouseButtonCallback);
     glfwSetScrollCallback(window, Mouse::mouseWheelCallback);
 
-    // Shaders
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    // SHADERS====================================================================
     Shader shader("assets/vertex_core.glsl", "assets/fragment_core.glsl");
     Shader shader2("assets/vertex_core.glsl", "assets/fragment_core2.glsl");
 
+    // Z BUFFER
+    glEnable(GL_DEPTH_TEST);
+
     float vertices[] = {
-        // positions            colors              texturecoords
-        -0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 0.5f,   0.0f, 0.0f,
-        -0.5f,  0.5f, 0.0f,     0.5f, 1.0f, 0.75f,  0.0f, 1.0f,
-         0.5f, -0.5f, 0.0f,     0.6f, 1.0f, 0.2f,   1.0f, 0.0f,
-         0.5f,  0.5f, 0.0f,     1.0f, 0.2f, 1.0f,   1.0f, 1.0f
-    };
-    unsigned int indices[] = {
-        0,1,2, // first tri
-        3,1,2 // second tri
+    // pos                tex coord
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
 
-    // VAO, VBO
+    // VAO, VBO, EBO
     unsigned int VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
 
     // bind VAO
     glBindVertexArray(VAO);
@@ -112,16 +148,16 @@ int main() {
 
     // set attribute pointers
     // positions
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
     // color
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+    /*glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);*/
     // texture coords
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
-    // TEXTURES
+    // TEXTURES_________________________________________________________________________________________
     unsigned int texture1, texture2;
 
     glGenTextures(1, &texture1);
@@ -164,36 +200,27 @@ int main() {
     shader.setInt("texture1", 0);
     shader.setInt("texture2", 1);
 
-    // set eup EBO
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    // view matrix
+    x = 0.0f;
+    y = 0.0f;
+    z = 3.0f;
 
     // ERROR CHECK
-    cout << "after VAO,VBO bind | error code: " << glGetError() << endl;
+    cout << "before mainloop | error code: " << glGetError() << endl;
     glCheckError();
 
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::rotate(trans, glm::radians(0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    shader.activate();
-    shader.setMat4("transform", trans);
-
-    /*glm::mat4 trans2 = glm::mat4(1.0f);
-    trans2 = glm::scale(trans2, glm::vec3(1.5f));
-    trans2 = glm::rotate(trans2, glm::radians(45.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-    shader2.activate();
-    shader2.setMat4("transform", trans);*/
-
-
-    
-
-    // MAIN LOOP
+    // MAIN LOOP===============================================================================
     while (!glfwWindowShouldClose(window))
     {
-        processInput(window);
+        double currentTime = glfwGetTime();
+        deltaTime = currentTime - lastFrame;
+        lastFrame = currentTime;
+
+        processInput(window, deltaTime);
 
         // render
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f); // gray screen
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glActiveTexture(GL_TEXTURE0); // activates current unit
         glBindTexture(GL_TEXTURE_2D, texture1); // binds texture to active unit
@@ -202,26 +229,27 @@ int main() {
         
         // draw shapes
         glBindVertexArray(VAO);
+
+        // create transformation for screen
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::mat4 view = glm::mat4(1.0f);
+        glm::mat4 projection = glm::mat4(1.0f);
+
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(-55.0f), glm::vec3(0.5f));
+        //view = glm::translate(view, glm::vec3(-x, -y, -z));
+        view = camera.getViewMatrix();
+        projection = glm::perspective(glm::radians(camera.zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+
         shader.activate();
-        
-        //float timeValue = glfwGetTime();
 
-        //// rotate continuous
-        //trans = glm::rotate(trans, glm::radians((float)glfwGetTime() / 100.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        //shader.activate();
-        
+        shader.setMat4("model", model);
+        shader.setMat4("view", view);
+        shader.setMat4("projection", projection);
         shader.setFloat("mixVal", mixVal);
-        shader.setMat4("transform", transform);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        /*trans2 = glm::rotate(trans2, glm::radians((float)glfwGetTime() / -100.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        shader2.activate();
-        shader2.setMat4("transform", trans2);
-
-        shader2.activate();
-        glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_INT, (void*)(3 * sizeof(GLuint)));*/
-
+        glBindVertexArray(0);
 
         // send new frame to window
         glfwSwapBuffers(window);
@@ -229,8 +257,7 @@ int main() {
     }
 
     glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VAO);
-    glDeleteBuffers(1, &EBO);
+    glDeleteBuffers(1, &VBO);
 
     glfwTerminate();
 	return 0;
@@ -262,9 +289,12 @@ GLenum glCheckError_(const char* file, int line)
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+    SCR_WIDTH = width;
+    SCR_HEIGHT = height;
+
 }
 
-void processInput(GLFWwindow* window)
+void processInput(GLFWwindow* window, double dt)
 {   
     // if ESC key is pressed, close window
     if (Keyboard::key(GLFW_KEY_ESCAPE)) {
@@ -281,17 +311,38 @@ void processInput(GLFWwindow* window)
         if (mixVal < 0) { mixVal = 0; }
     }
 
+    // camera movement
     if (Keyboard::key(GLFW_KEY_W)) {
-        transform = glm::translate(transform, glm::vec3(0.0f, 0.1f, 0.0f));
+        camera.updateCameraPos(CameraDirection::FORWARD, dt);
     }
     if (Keyboard::key(GLFW_KEY_S)) {
-        transform = glm::translate(transform, glm::vec3(0.0f, -0.1f, 0.0f));
+        camera.updateCameraPos(CameraDirection::BACKWARD, dt);
     }
     if (Keyboard::key(GLFW_KEY_A)) {
-        transform = glm::translate(transform, glm::vec3(-0.1f, 0.0f, 0.0f));
+        camera.updateCameraPos(CameraDirection::LEFT, dt);
     }
     if (Keyboard::key(GLFW_KEY_D)) {
-        transform = glm::translate(transform, glm::vec3(0.1f, 0.0f, 0.0f));
+        camera.updateCameraPos(CameraDirection::RIGHT, dt);
     }
+    if (Keyboard::key(GLFW_KEY_SPACE)) {
+        camera.updateCameraPos(CameraDirection::UP, dt);
+    }
+    if (Keyboard::key(GLFW_KEY_LEFT_SHIFT)) {
+        camera.updateCameraPos(CameraDirection::DOWN, dt);
+    }
+
+    // camera look
+    double dx = Mouse::getDX(), dy = Mouse::getDY();
+    if (dx != 0 || dy != 0) {
+        camera.updateCameraDirection(dx,dy);
+    }
+
+    // camera zoom
+    double scrollDy = Mouse::getScrollDY();
+    if (scrollDy != 0) {
+        camera.updateCameraZoom(scrollDy);
+    }
+
+
 }
 

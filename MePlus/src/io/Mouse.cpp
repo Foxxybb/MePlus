@@ -65,19 +65,19 @@ bool Mouse::buttonsChanged[GLFW_MOUSE_BUTTON_LAST] = { 0 };
  }
  double Mouse::getDY(){
 	 double _dy = dy;
-	 dx = 0;
+	 dy = 0;
 	 return _dy;
  }
 
  double Mouse::getScrollDX(){
 	 double _dx = scrollDX;
 	 scrollDX = 0;
-	 return dx;
+	 return _dx;
  }
  double Mouse::getScrollDY(){
-	 double dy = scrollDY;
+	 double _dy = scrollDY;
 	 scrollDY = 0;
-	 return dy;
+	 return _dy;
  }
 
  bool Mouse::button(int button){

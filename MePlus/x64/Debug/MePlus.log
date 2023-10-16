@@ -1,4 +1,2 @@
-﻿  main.cpp
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(36,10): warning C4101: 'infoLog': unreferenced local variable
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(35,9): warning C4101: 'success': unreferenced local variable
+﻿  Mouse.cpp
   MePlus.vcxproj -> C:\Users\leetl\Documents\GitHub\MePlus\x64\Debug\MePlus.exe
