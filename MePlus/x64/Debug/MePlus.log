@@ -1,6 +1,7 @@
 ﻿  main.cpp
 C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\graphics\models\cube.hpp(66,36): warning C4018: '<': signed/unsigned mismatch
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\graphics\models\cube.hpp(75,81): error C2065: 'tex0': undeclared identifier
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\graphics\models\cube.hpp(75,87): error C2065: 'tex1': undeclared identifier
 C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(103,33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
 C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(104,21): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(49,10): warning C4101: 'infoLog': unreferenced local variable
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(48,9): warning C4101: 'success': unreferenced local variable
+  MePlus.vcxproj -> C:\Users\leetl\Documents\GitHub\MePlus\x64\Debug\MePlus.exe
