@@ -132,6 +132,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\graphics\Light.cpp" />
     <ClCompile Include="src\graphics\Material.cpp" />
     <ClCompile Include="src\graphics\Model.cpp" />
     <ClCompile Include="src\graphics\Mesh.cpp" />
@@ -152,6 +153,7 @@
     <None Include="glfw3.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\graphics\Light.h" />
     <ClInclude Include="src\graphics\Material.h" />
     <ClInclude Include="src\graphics\Model.h" />
     <ClInclude Include="src\graphics\Mesh.h" />
