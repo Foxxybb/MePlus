@@ -8,12 +8,14 @@ Model::Model(vec3 pos, vec3 size, bool noTex)
 
 void Model::init() { }
 
-void Model::render(Shader shader) {
-	mat4 model = mat4(1.0f);
-	model = translate(model, pos);
-	model = scale(model, size);
-	shader.setMat4("model", model);
-
+void Model::render(Shader shader, bool setModel) {
+	if (setModel) {
+		mat4 model = mat4(1.0f);
+		model = translate(model, pos);
+		model = scale(model, size);
+		shader.setMat4("model", model);
+	}
+	
 	shader.setFloat("material.shininess", 0.5f);
 
 	for (Mesh mesh : meshes) {
