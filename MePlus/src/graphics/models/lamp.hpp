@@ -17,9 +17,9 @@ public:
     Lamp() {}
 
     Lamp(glm::vec3 lightColor,
-        glm::vec3 ambient,
-        glm::vec3 diffuse,
-        glm::vec3 specular,
+        glm::vec4 ambient,
+        glm::vec4 diffuse,
+        glm::vec4 specular,
         float k0,
         float k1,
         float k2,
@@ -27,7 +27,7 @@ public:
         glm::vec3 size)
         : lightColor(lightColor),
         pointLight({ pos, k0, k1, k2, ambient, diffuse, specular }),
-        Cube(Material::white_plastic, pos, size) {}
+        Cube( pos, size) {}
 
     void render(Shader shader) {
         // set light color

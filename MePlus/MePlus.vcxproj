@@ -148,6 +148,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\lamp.fs" />
+    <None Include="assets\models\w1block.bin" />
+    <None Include="assets\models\w1block.gltf" />
     <None Include="assets\object.fs" />
     <None Include="assets\object.vs" />
     <None Include="glfw3.dll" />

@@ -1,8 +1,7 @@
 ﻿  main.cpp
 C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\graphics\models\cube.hpp(68,36): warning C4018: '<': signed/unsigned mismatch
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(149,33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(150,21): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(52,10): warning C4101: 'infoLog': unreferenced local variable
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(51,9): warning C4101: 'success': unreferenced local variable
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(133,33): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(134,21): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(53,10): warning C4101: 'infoLog': unreferenced local variable
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(52,9): warning C4101: 'success': unreferenced local variable
   MePlus.vcxproj -> C:\Users\leetl\Documents\GitHub\MePlus\x64\Debug\MePlus.exe
