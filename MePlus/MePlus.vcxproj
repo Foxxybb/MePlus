@@ -132,6 +132,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\physics\rigidbody.cpp" />
     <ClCompile Include="src\graphics\Light.cpp" />
     <ClCompile Include="src\graphics\Material.cpp" />
     <ClCompile Include="src\graphics\Model.cpp" />
@@ -155,12 +156,14 @@
     <None Include="glfw3.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\physics\rigidbody.h" />
     <ClInclude Include="src\graphics\Light.h" />
     <ClInclude Include="src\graphics\Material.h" />
     <ClInclude Include="src\graphics\Model.h" />
     <ClInclude Include="src\graphics\Mesh.h" />
     <ClInclude Include="src\graphics\models\cube.hpp" />
     <ClInclude Include="src\graphics\models\gun.hpp" />
+    <ClInclude Include="src\graphics\models\ico.hpp" />
     <ClInclude Include="src\graphics\models\lamp.hpp" />
     <ClInclude Include="src\io\Screen.h" />
     <ClInclude Include="src\io\Camera.h" />

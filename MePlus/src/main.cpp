@@ -21,6 +21,7 @@
 #include "graphics/models/cube.hpp"
 #include "graphics/models/lamp.hpp"
 #include "graphics/models/gun.hpp"
+#include "graphics/models/ico.hpp"
 
 #include "io/Keyboard.h"
 #include "io/Mouse.h"
@@ -28,6 +29,7 @@
 #include "io/Screen.h"
 
 using namespace std;
+using namespace glm;
 
 void processInput(double dt);
 
@@ -94,8 +96,11 @@ int main() {
     Shader lampShader("assets/object.vs", "assets/lamp.fs");
 
     // MODELS=====================================================================
-    Gun g;
-    g.loadModel("assets/models/scene.gltf");
+    //Gun g;
+    //g.loadModel("assets/models/scene.gltf");
+
+    Ico ico(vec3(0.0f), vec3(0.25f));
+    ico.init();
 
     DirLight dirLight = { glm::vec3(-0.2f, -1.0, -0.3), 
         glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), 
@@ -177,7 +182,7 @@ int main() {
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
 
-        g.render(shader);
+        ico.render(shader);
 
         lampShader.activate();
         lampShader.setMat4("view", view);
@@ -191,7 +196,7 @@ int main() {
         screen.newFrame();
     }
 
-    g.cleanup();
+    ico.cleanup();
 
     for (int i = 0; i < 4; i++) {
         lamps[i].cleanup();

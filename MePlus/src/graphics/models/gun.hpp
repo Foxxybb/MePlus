@@ -7,14 +7,14 @@ using namespace glm;
 class Gun : public Model {
 public:
 	Gun()
-		: Model(vec3(0.0f), vec3(0.05), true) {}
+		: Model(vec3(0.0f), vec3(1/300.0f), true) {}
 
 	void render(Shader shader, bool setModel = false) {
 		mat4 model = mat4(1.0f);
 
 		// set position
 		vec3 down = cross(Camera::defaultCamera.cameraFront, Camera::defaultCamera.cameraRight);
-		pos = Camera::defaultCamera.cameraPos + vec3(Camera::defaultCamera.cameraFront * 2.0f) - vec3(Camera::defaultCamera.cameraUp * -1.0f);
+		pos = Camera::defaultCamera.cameraPos + vec3(Camera::defaultCamera.cameraFront * 0.2f) - vec3(Camera::defaultCamera.cameraUp * 0.1f);
 		model = translate(model, pos);
 
 		float theta;
