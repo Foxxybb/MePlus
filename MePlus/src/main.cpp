@@ -3,10 +3,13 @@
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
 
+#include <string>
+#include <vector>
+#include <stack>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
 
 #include <fstream>
 #include <sstream>
@@ -23,6 +26,8 @@
 #include "graphics/models/gun.hpp"
 #include "graphics/models/ico.hpp"
 
+#include "physics/environment.h"
+
 #include "io/Keyboard.h"
 #include "io/Mouse.h"
 #include "io/Camera.h"
@@ -33,18 +38,19 @@ using namespace glm;
 
 void processInput(double dt);
 
-float mixVal = 0.5f;
-
 Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
 Camera Camera::defaultCamera(glm::vec3(0.0f, 0.0f, 0.0f));
 
-float deltaTime = 0.0f; // time between frames
+float dt = 0.0f; // time between frames
 float lastFrame = 0.0f; // time of last frame
 
 bool flashLightOn = true;
 
 unsigned int SCR_WIDTH = 800, SCR_HEIGHT = 600;
 float theta = 45.0f;
+
+//Ico ico(vec3(0.0f), vec3(0.25f));
+vector<Ico> launchObjects;
 
 Screen screen;
 
@@ -98,9 +104,7 @@ int main() {
     // MODELS=====================================================================
     //Gun g;
     //g.loadModel("assets/models/scene.gltf");
-
-    Ico ico(vec3(0.0f), vec3(0.25f));
-    ico.init();
+    
 
     DirLight dirLight = { glm::vec3(-0.2f, -1.0, -0.3), 
         glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), 
@@ -139,11 +143,12 @@ int main() {
     // MAIN LOOP===============================================================================
     while (!screen.shouldClose())
     {
+        // calculate dt
         double currentTime = glfwGetTime();
-        deltaTime = currentTime - lastFrame;
+        dt = currentTime - lastFrame;
         lastFrame = currentTime;
 
-        processInput(deltaTime);
+        processInput(dt);
 
         // render
         screen.update();
@@ -172,7 +177,6 @@ int main() {
             shader.setInt("noSpotLights", 0);
         }
         
-
         // create transformation for screen
         glm::mat4 view = glm::mat4(1.0f);
         glm::mat4 projection = glm::mat4(1.0f);
@@ -182,21 +186,37 @@ int main() {
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
 
-        ico.render(shader);
+        //ico.render(shader, dt);
+
+        // REMOVE ICO SPHERES
+        stack<int> removeObjects;
+        for (Ico &ico : launchObjects) {
+            if (length(Camera::defaultCamera.cameraPos - ico.rb.pos) > 30.0f) {
+                launchObjects.erase(launchObjects.begin());
+            }
+        }
+
+        for (Ico &ico : launchObjects) {
+            ico.render(shader, dt);
+        }
 
         lampShader.activate();
         lampShader.setMat4("view", view);
         lampShader.setMat4("projection", projection);
         //lamp.render(lampShader);
         for (int i = 0; i < 4; i++) {
-            lamps[i].render(lampShader);
+            lamps[i].render(lampShader, dt);
         }
 
         // send new frame to window
         screen.newFrame();
     }
 
-    ico.cleanup();
+    // Cleanup
+
+    for (Ico ico : launchObjects) {
+        ico.cleanup();
+    }
 
     for (int i = 0; i < 4; i++) {
         lamps[i].cleanup();
@@ -227,6 +247,13 @@ GLenum glCheckError_(const char* file, int line)
     return errorCode;
 }
 
+void launchItem(float dt) {
+    Ico newIco(Camera::defaultCamera.cameraPos, vec3(0.25f));
+    newIco.init();
+    newIco.rb.applyAcceleration(Environment::gravitationalAcceleration);
+    newIco.rb.applyImpulse(Camera::defaultCamera.cameraFront, 1000.0f, dt);
+    launchObjects.push_back(newIco);
+}
 
 void processInput(double dt)
 {   
@@ -260,6 +287,10 @@ void processInput(double dt)
         camera.defaultCamera.updateCameraPos(CameraDirection::DOWN, dt);
     }
 
+    if (Keyboard::keyWentDown(GLFW_KEY_F)) {
+        launchItem(dt);
+    }
+
     // camera look
     double dx = Mouse::getDX(), dy = Mouse::getDY();
     if (dx != 0 || dy != 0) {
@@ -271,7 +302,6 @@ void processInput(double dt)
     if (scrollDy != 0) {
         camera.defaultCamera.updateCameraZoom(scrollDy);
     }
-
 
 }
 

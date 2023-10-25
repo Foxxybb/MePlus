@@ -1,17 +1,26 @@
 #include "Model.h"
 
+#include "../physics/environment.h"
+
+#include <iostream>
+
 using namespace glm;
 
 Model::Model(vec3 pos, vec3 size, bool noTex)
-	: pos(pos), size(size), noTex(noTex) {}
+	: size(size), noTex(noTex) {
+	rb.pos = pos;
+	//rb.acceleration = Environment::gravitationalAcceleration;
+}
 
 
 void Model::init() { }
 
-void Model::render(Shader shader, bool setModel) {
+void Model::render(Shader shader, float dt, bool setModel) {
+	rb.update(dt);
+
 	if (setModel) {
 		mat4 model = mat4(1.0f);
-		model = translate(model, pos);
+		model = translate(model, rb.pos);
 		model = scale(model, size);
 		shader.setMat4("model", model);
 	}

@@ -79,5 +79,9 @@ public:
 
 	}
 
+    void render(Shader shader, float dt) {
+        Model::render(shader, dt);
+    }
+
 };
 #endif // !CUBE_HPP

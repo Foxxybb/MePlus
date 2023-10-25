@@ -9,13 +9,13 @@ public:
 	Gun()
 		: Model(vec3(0.0f), vec3(1/300.0f), true) {}
 
-	void render(Shader shader, bool setModel = false) {
+	void render(Shader shader, float dt, bool setModel = false) {
 		mat4 model = mat4(1.0f);
 
 		// set position
 		vec3 down = cross(Camera::defaultCamera.cameraFront, Camera::defaultCamera.cameraRight);
-		pos = Camera::defaultCamera.cameraPos + vec3(Camera::defaultCamera.cameraFront * 0.2f) - vec3(Camera::defaultCamera.cameraUp * 0.1f);
-		model = translate(model, pos);
+		rb.pos = Camera::defaultCamera.cameraPos + vec3(Camera::defaultCamera.cameraFront * 0.2f) - vec3(Camera::defaultCamera.cameraUp * 0.1f);
+		model = translate(model, rb.pos);
 
 		float theta;
 
@@ -34,6 +34,6 @@ public:
 
 		shader.setMat4("model", model);
 
-		Model::render(shader, false);
+		Model::render(shader, dt, false);
 	}
 };
