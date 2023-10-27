@@ -25,6 +25,7 @@
 #include "graphics/models/lamp.hpp"
 #include "graphics/models/gun.hpp"
 #include "graphics/models/ico.hpp"
+#include "graphics/models/block.hpp"
 
 #include "physics/environment.h"
 
@@ -104,20 +105,31 @@ int main() {
     // MODELS=====================================================================
     //Gun g;
     //g.loadModel("assets/models/scene.gltf");
-    
 
+    // stage block
+    Block myBlock;
+    myBlock.init();
+    myBlock.size = vec3(5.0f);
+    myBlock.rb.pos = vec3(0.0f, -5.0f, 0.0f);
+
+    Ico myIco;
+    myIco.init();
+
+    // rotating sun
     DirLight dirLight = { glm::vec3(-0.2f, -1.0, -0.3), 
         glm::vec4(0.1f, 0.1f, 0.1f, 1.0f), 
         glm::vec4(0.4f, 0.4f, 0.4f, 1.0f), 
-        glm::vec4(0.75f,0.75f,0.75f,1.0f) };
+        glm::vec4(0.75f,0.75f,0.75f,1.0f) 
+    };
 
     glm::vec3 pointLightPositions[] = {
             glm::vec3(0.7f,  0.2f,  2.0f),
             glm::vec3(2.3f, -3.3f, -4.0f),
-            glm::vec3(-4.0f,  2.0f, -12.0f),
+            glm::vec3(-4.0f,  2.0f, -1.0f),
             glm::vec3(0.0f,  0.0f, -3.0f)
     };
-    Lamp lamps[4];
+
+    /*Lamp lamps[4];
     for (unsigned int i = 0; i < 4; i++) {
         lamps[i] = Lamp(glm::vec3(1.0f),
             glm::vec4(0.05f, 0.05f, 0.05f, 1.0f),
@@ -126,7 +138,7 @@ int main() {
             1.0f, 0.07f, 0.032f,
             pointLightPositions[i], glm::vec3(0.25f));
         lamps[i].init();
-    }
+    }*/
 
     // flashlight
     SpotLight s = {
@@ -136,6 +148,27 @@ int main() {
         glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f), glm::vec4(1.0f)
     };
 
+    // MY STUFF =========================================================================
+    // set pointLight (myLamp) at center of world (offset 1,1,1)
+    Lamp myLamp;
+    myLamp = Lamp(vec3(1.0f, 1.0f, 1.0f), // light color
+        vec4(0.05f, 0.05f, 0.05f, 1.0f), // ambi
+        vec4(0.8f, 0.8f, 0.8f, 1.0f),  // diff
+        vec4(1.0f, 1.0f, 1.0f, 1.0f), // spec
+        1.0f, 0.07f, 0.032f, // light strength?
+        vec3(2.0f), // position
+        vec3(0.5f) // size
+    );
+    myLamp.init();
+
+    // set cube at center of world
+    /*Cube myCube;
+    myCube = Cube(vec3(0.0f), vec3(0.5f));
+    myCube.material = Material::brass;
+    myCube.init();*/
+
+
+
     // ERROR CHECK
     cout << "before mainloop | error code: " << glGetError() << endl;
     glCheckError();
@@ -143,14 +176,14 @@ int main() {
     // MAIN LOOP===============================================================================
     while (!screen.shouldClose())
     {
-        // calculate dt
+        // calculate dt (deltaTime)
         double currentTime = glfwGetTime();
         dt = currentTime - lastFrame;
         lastFrame = currentTime;
 
         processInput(dt);
 
-        // render
+        // RENDER =========================
         screen.update();
 
         shader.activate();
@@ -162,11 +195,19 @@ int main() {
             glm::vec4(dirLight.direction, 1.0f));
         dirLight.render(shader);
 
-        for (int i = 0; i < 4; i++) {
+        //myLamp.rb.velocity = vec3(1.0f);
+
+        // render lamps
+        /*for (int i = 0; i < 4; i++) {
             lamps[i].pointLight.render(shader, i);
         }
-        shader.setInt("noPointLights", 4);
+        shader.setInt("noPointLights", 4);*/
 
+        // render my stuff
+        myLamp.pointLight.render(shader, 0);
+        shader.setInt("noPointLights", 1);
+
+        // flashlight (pov spotLight)
         if (flashLightOn) {
             s.position = camera.defaultCamera.cameraPos;
             s.direction = camera.defaultCamera.cameraFront;
@@ -186,8 +227,6 @@ int main() {
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
 
-        //ico.render(shader, dt);
-
         // REMOVE ICO SPHERES
         stack<int> removeObjects;
         for (Ico &ico : launchObjects) {
@@ -200,27 +239,36 @@ int main() {
             ico.render(shader, dt);
         }
 
+        //myIco.render(shader, dt);
+        myBlock.render(shader, dt);
+        //myCube.render(shader, dt);
+
         lampShader.activate();
         lampShader.setMat4("view", view);
         lampShader.setMat4("projection", projection);
         //lamp.render(lampShader);
-        for (int i = 0; i < 4; i++) {
+        /*for (int i = 0; i < 4; i++) {
             lamps[i].render(lampShader, dt);
-        }
+        }*/
+        myLamp.render(lampShader, dt);
 
         // send new frame to window
         screen.newFrame();
     }
 
     // Cleanup
-
     for (Ico ico : launchObjects) {
         ico.cleanup();
     }
+    myIco.cleanup();
+    myBlock.cleanup();
 
-    for (int i = 0; i < 4; i++) {
+    /*for (int i = 0; i < 4; i++) {
         lamps[i].cleanup();
-    }
+    }*/
+    myLamp.cleanup();
+
+    //myCube.cleanup();
 
     glfwTerminate();
 	return 0;

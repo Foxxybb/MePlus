@@ -157,6 +157,7 @@
     <None Include="glfw3.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\graphics\models\block.hpp" />
     <ClInclude Include="src\physics\environment.h" />
     <ClInclude Include="src\physics\rigidbody.h" />
     <ClInclude Include="src\graphics\Light.h" />
