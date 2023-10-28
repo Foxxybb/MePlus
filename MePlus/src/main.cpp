@@ -40,18 +40,20 @@ using namespace glm;
 void processInput(double dt);
 
 Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
-Camera Camera::defaultCamera(glm::vec3(0.0f, 0.0f, 0.0f));
+Camera Camera::defaultCamera(vec3(-8.0f, 8.0f, 0.0f));
 
 float dt = 0.0f; // time between frames
 float lastFrame = 0.0f; // time of last frame
 
-bool flashLightOn = true;
+bool flashLightOn = false;
 
 unsigned int SCR_WIDTH = 800, SCR_HEIGHT = 600;
 float theta = 45.0f;
 
 //Ico ico(vec3(0.0f), vec3(0.25f));
 vector<Ico> launchObjects;
+vector<Lamp> sentLamps;
+unsigned int numPointLights = 1;
 
 Screen screen;
 
@@ -59,6 +61,7 @@ GLenum glCheckError_(const char* file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__);
 
 int main() {
+    // SETUP ======================================================
 	cout << "Hello, world!" << endl;
 
     int success;
@@ -70,7 +73,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     // #ifdef __APPLE__
-    // glfwWindowHint(GLFW_OPENGL_FORWARD_COPMPAT, GL_TRUE);
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     // #endif
 
     if (!screen.init()) {
@@ -149,17 +152,17 @@ int main() {
     };
 
     // MY STUFF =========================================================================
-    // set pointLight (myLamp) at center of world (offset 1,1,1)
-    Lamp myLamp;
-    myLamp = Lamp(vec3(1.0f, 1.0f, 1.0f), // light color
+    // set pointLight (myLamp) at center of world
+    Lamp testLamp;
+    testLamp = Lamp(vec3(1.0f, 1.0f, 1.0f), // light color
         vec4(0.05f, 0.05f, 0.05f, 1.0f), // ambi
         vec4(0.8f, 0.8f, 0.8f, 1.0f),  // diff
         vec4(1.0f, 1.0f, 1.0f, 1.0f), // spec
         1.0f, 0.07f, 0.032f, // light strength?
-        vec3(2.0f), // position
-        vec3(0.5f) // size
+        vec3(0.0f, 2.0f, 0.0f), // position
+        vec3(0.2f) // size
     );
-    myLamp.init();
+    testLamp.init();
 
     // set cube at center of world
     /*Cube myCube;
@@ -167,7 +170,7 @@ int main() {
     myCube.material = Material::brass;
     myCube.init();*/
 
-
+    camera.defaultCamera.updateCameraDirection(0.0f, -50.0f); // looking down at the stage
 
     // ERROR CHECK
     cout << "before mainloop | error code: " << glGetError() << endl;
@@ -203,9 +206,17 @@ int main() {
         }
         shader.setInt("noPointLights", 4);*/
 
-        // render my stuff
-        myLamp.pointLight.render(shader, 0);
-        shader.setInt("noPointLights", 1);
+        // RENDER LIGHTS ===========================================
+        testLamp.pointLight.render(shader, 0);
+
+        for (int i = 0; i < sentLamps.size(); i++) {
+            sentLamps[i].pointLight.render(shader, i+1);
+        }
+
+        // update number of point lights for shader
+        shader.setInt("noPointLights", 1+sentLamps.size());
+
+        
 
         // flashlight (pov spotLight)
         if (flashLightOn) {
@@ -228,16 +239,25 @@ int main() {
         shader.setMat4("projection", projection);
 
         // REMOVE ICO SPHERES
-        stack<int> removeObjects;
         for (Ico &ico : launchObjects) {
             if (length(Camera::defaultCamera.cameraPos - ico.rb.pos) > 30.0f) {
                 launchObjects.erase(launchObjects.begin());
             }
         }
 
+        // REMOVE LAMPS
+        /*for (Lamp &lamp : sentLamps) {
+            if (length(Camera::defaultCamera.cameraPos - lamp.rb.pos) > 30.0f) {
+                sentLamps.erase(sentLamps.begin());
+                numPointLights--;
+            }
+        }*/
+
+        // RENDER ICO
         for (Ico &ico : launchObjects) {
             ico.render(shader, dt);
         }
+        
 
         //myIco.render(shader, dt);
         myBlock.render(shader, dt);
@@ -250,7 +270,12 @@ int main() {
         /*for (int i = 0; i < 4; i++) {
             lamps[i].render(lampShader, dt);
         }*/
-        myLamp.render(lampShader, dt);
+        testLamp.render(lampShader, dt);
+
+        // RENDER SENTLAMPS
+        for (Lamp &lamp : sentLamps) {
+            lamp.render(lampShader, dt);
+        }
 
         // send new frame to window
         screen.newFrame();
@@ -260,15 +285,17 @@ int main() {
     for (Ico ico : launchObjects) {
         ico.cleanup();
     }
-    myIco.cleanup();
+    //myIco.cleanup();
     myBlock.cleanup();
+
+    for (Lamp lamp : sentLamps) {
+        lamp.cleanup();
+    }
 
     /*for (int i = 0; i < 4; i++) {
         lamps[i].cleanup();
     }*/
-    myLamp.cleanup();
-
-    //myCube.cleanup();
+    testLamp.cleanup();
 
     glfwTerminate();
 	return 0;
@@ -303,6 +330,23 @@ void launchItem(float dt) {
     launchObjects.push_back(newIco);
 }
 
+void sendLamp(float dt) {
+    Lamp newLamp;
+    newLamp = Lamp(vec3(1.0f, 1.0f, 1.0f), // light color
+        vec4(0.05f, 0.05f, 0.05f, 1.0f), // ambi
+        vec4(0.8f, 0.8f, 0.8f, 1.0f),  // diff
+        vec4(1.0f, 1.0f, 1.0f, 1.0f), // spec
+        1.0f, 0.07f, 0.032f, // light strength?
+        vec3(0.0f, 0.0f, 0.0f), // position
+        vec3(0.1f) // size
+    );
+    newLamp.init();
+    newLamp.rb.applyImpulse(vec3(0.0f,1.0f,0.0f), 10.0f, dt);
+    sentLamps.push_back(newLamp);
+    numPointLights++;
+    // update number of point lights for shader
+}
+
 void processInput(double dt)
 {   
     // if ESC key is pressed, close window
@@ -335,8 +379,14 @@ void processInput(double dt)
         camera.defaultCamera.updateCameraPos(CameraDirection::DOWN, dt);
     }
 
+    // shoot ball
     if (Keyboard::keyWentDown(GLFW_KEY_F)) {
         launchItem(dt);
+    }
+
+    // send lamp across stage
+    if (Keyboard::keyWentDown(GLFW_KEY_L)) {
+        sendLamp(dt);
     }
 
     // camera look
