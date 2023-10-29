@@ -1,4 +1,7 @@
 #include <iostream>
+#include <chrono>
+#include <thread>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <stb/stb_image.h>
@@ -6,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <stack>
+#include <stdlib.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -35,15 +39,18 @@
 #include "io/Screen.h"
 
 using namespace std;
+using namespace std::chrono;
 using namespace glm;
 
 void processInput(double dt);
+void sendLamp(float dt);
 
 Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
 Camera Camera::defaultCamera(vec3(-8.0f, 8.0f, 0.0f));
 
 float dt = 0.0f; // time between frames
 float lastFrame = 0.0f; // time of last frame
+int altInt = 1; // used to flip + and - with RNG
 
 bool flashLightOn = false;
 
@@ -63,6 +70,8 @@ GLenum glCheckError_(const char* file, int line);
 int main() {
     // SETUP ======================================================
 	cout << "Hello, world!" << endl;
+    // seed RNG
+    srand(time(NULL));
 
     int success;
     char infoLog[512];
@@ -125,12 +134,12 @@ int main() {
         glm::vec4(0.75f,0.75f,0.75f,1.0f) 
     };
 
-    glm::vec3 pointLightPositions[] = {
+    /*glm::vec3 pointLightPositions[] = {
             glm::vec3(0.7f,  0.2f,  2.0f),
             glm::vec3(2.3f, -3.3f, -4.0f),
             glm::vec3(-4.0f,  2.0f, -1.0f),
             glm::vec3(0.0f,  0.0f, -3.0f)
-    };
+    };*/
 
     /*Lamp lamps[4];
     for (unsigned int i = 0; i < 4; i++) {
@@ -153,16 +162,16 @@ int main() {
 
     // MY STUFF =========================================================================
     // set pointLight (myLamp) at center of world
-    Lamp testLamp;
-    testLamp = Lamp(vec3(1.0f, 1.0f, 1.0f), // light color
-        vec4(0.05f, 0.05f, 0.05f, 1.0f), // ambi
-        vec4(0.8f, 0.8f, 0.8f, 1.0f),  // diff
-        vec4(1.0f, 1.0f, 1.0f, 1.0f), // spec
-        1.0f, 0.07f, 0.032f, // light strength?
-        vec3(0.0f, 2.0f, 0.0f), // position
-        vec3(0.2f) // size
-    );
-    testLamp.init();
+    //Lamp testLamp;
+    //testLamp = Lamp(vec3(1.0f, 1.0f, 1.0f), // light color
+    //    vec4(0.05f, 0.05f, 0.05f, 1.0f), // ambi
+    //    vec4(0.8f, 0.8f, 0.8f, 1.0f),  // diff
+    //    vec4(1.0f, 1.0f, 1.0f, 1.0f), // spec
+    //    1.0f, 0.07f, 0.032f, // light strength?
+    //    vec3(4.0f, 4.0f, 4.0f), // position
+    //    vec3(0.1f) // size
+    //);
+    //testLamp.init();
 
     // set cube at center of world
     /*Cube myCube;
@@ -172,9 +181,17 @@ int main() {
 
     camera.defaultCamera.updateCameraDirection(0.0f, -50.0f); // looking down at the stage
 
+    
+
     // ERROR CHECK
     cout << "before mainloop | error code: " << glGetError() << endl;
     glCheckError();
+
+    // start lamp sending thread
+    //auto three_seconds = 3s;
+    //thread (sendLamp, dt).detach();
+    float lampTimer = 0.0f;
+    float lampTimerIncrement = 3.0f;
 
     // MAIN LOOP===============================================================================
     while (!screen.shouldClose())
@@ -183,6 +200,12 @@ int main() {
         double currentTime = glfwGetTime();
         dt = currentTime - lastFrame;
         lastFrame = currentTime;
+
+        // if currentTime exceeds lampTimer, fire sendLamp() and extend timer
+        if (currentTime > lampTimer) {
+            sendLamp(dt);
+            lampTimer += lampTimerIncrement;
+        }
 
         processInput(dt);
 
@@ -207,16 +230,14 @@ int main() {
         shader.setInt("noPointLights", 4);*/
 
         // RENDER LIGHTS ===========================================
-        testLamp.pointLight.render(shader, 0);
+        //testLamp.pointLight.render(shader, 0);
 
         for (int i = 0; i < sentLamps.size(); i++) {
-            sentLamps[i].pointLight.render(shader, i+1);
+            sentLamps[i].pointLight.render(shader, i);
         }
 
         // update number of point lights for shader
-        shader.setInt("noPointLights", 1+sentLamps.size());
-
-        
+        shader.setInt("noPointLights", sentLamps.size());
 
         // flashlight (pov spotLight)
         if (flashLightOn) {
@@ -246,18 +267,18 @@ int main() {
         }
 
         // REMOVE LAMPS
-        /*for (Lamp &lamp : sentLamps) {
-            if (length(Camera::defaultCamera.cameraPos - lamp.rb.pos) > 30.0f) {
+        for (Lamp &lamp : sentLamps) {
+            // erase when lamp is too far from camera
+            if (length(Camera::defaultCamera.cameraPos - lamp.rb.pos) > 50.0f) {
                 sentLamps.erase(sentLamps.begin());
                 numPointLights--;
             }
-        }*/
+        }
 
         // RENDER ICO
         for (Ico &ico : launchObjects) {
             ico.render(shader, dt);
         }
-        
 
         //myIco.render(shader, dt);
         myBlock.render(shader, dt);
@@ -270,7 +291,7 @@ int main() {
         /*for (int i = 0; i < 4; i++) {
             lamps[i].render(lampShader, dt);
         }*/
-        testLamp.render(lampShader, dt);
+        //testLamp.render(lampShader, dt);
 
         // RENDER SENTLAMPS
         for (Lamp &lamp : sentLamps) {
@@ -295,7 +316,7 @@ int main() {
     /*for (int i = 0; i < 4; i++) {
         lamps[i].cleanup();
     }*/
-    testLamp.cleanup();
+    //testLamp.cleanup();
 
     glfwTerminate();
 	return 0;
@@ -331,20 +352,33 @@ void launchItem(float dt) {
 }
 
 void sendLamp(float dt) {
+    
+    // get a random float to spawn a lamp on the Z plane with
+    float randZ = (float(rand()) / float((RAND_MAX)) * 6.0f);
+
+    randZ *= altInt;
+    altInt = altInt * -1; // flip altInt
+    cout << randZ << " : " << altInt << " : " << randZ << endl;
+
     Lamp newLamp;
     newLamp = Lamp(vec3(1.0f, 1.0f, 1.0f), // light color
         vec4(0.05f, 0.05f, 0.05f, 1.0f), // ambi
         vec4(0.8f, 0.8f, 0.8f, 1.0f),  // diff
         vec4(1.0f, 1.0f, 1.0f, 1.0f), // spec
         1.0f, 0.07f, 0.032f, // light strength?
-        vec3(0.0f, 0.0f, 0.0f), // position
+        vec3(30.0f, 3.0f, randZ), // position
         vec3(0.1f) // size
     );
     newLamp.init();
-    newLamp.rb.applyImpulse(vec3(0.0f,1.0f,0.0f), 10.0f, dt);
+    newLamp.rb.applyImpulse(vec3(-1.0f, 0.0f, 0.0f), 500.0f, dt);
     sentLamps.push_back(newLamp);
-    numPointLights++;
-    // update number of point lights for shader
+    numPointLights++; // update number of point lights for shader
+
+    // sleep, then call another lamp
+    //this_thread::sleep_for(3000ms);
+    //sendLamp(dt);
+    
+    
 }
 
 void processInput(double dt)
@@ -385,7 +419,7 @@ void processInput(double dt)
     }
 
     // send lamp across stage
-    if (Keyboard::keyWentDown(GLFW_KEY_L)) {
+    if (Keyboard::keyWentDown(GLFW_KEY_Z)) {
         sendLamp(dt);
     }
 

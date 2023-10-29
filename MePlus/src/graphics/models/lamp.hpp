@@ -33,6 +33,9 @@ public:
         // set light color
         shader.set3Float("lightColor", lightColor);
         Cube::render(shader, dt);
+
+        // update pointlight position to match lamp model
+        pointLight.position = this->rb.pos;
     }
 };
 
