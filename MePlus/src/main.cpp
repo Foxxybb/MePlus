@@ -38,6 +38,8 @@
 #include "io/Camera.h"
 #include "io/Screen.h"
 
+#include "algorithms/MyMalloc.h"
+
 using namespace std;
 using namespace std::chrono;
 using namespace glm;
@@ -64,14 +66,20 @@ unsigned int numPointLights = 1;
 
 Screen screen;
 
+MyMalloc myMalloc;
+
 GLenum glCheckError_(const char* file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__);
 
 int main() {
     // SETUP ======================================================
 	cout << "Hello, world!" << endl;
+
     // seed RNG
     srand(time(NULL));
+
+    // MyMalloc test
+    //myMalloc.alloc();
 
     int success;
     char infoLog[512];
@@ -107,8 +115,8 @@ int main() {
     glEnable(GL_DEPTH_TEST);
 
     // ERROR CHECK
-    cout << "before shaders | error code: " << glGetError() << endl;
-    glCheckError();
+    /*cout << "before shaders | error code: " << glGetError() << endl;
+    glCheckError();*/
 
     // SHADERS====================================================================
     Shader shader("assets/object.vs", "assets/object.fs");
@@ -181,11 +189,9 @@ int main() {
 
     camera.defaultCamera.updateCameraDirection(0.0f, -50.0f); // looking down at the stage
 
-    
-
     // ERROR CHECK
-    cout << "before mainloop | error code: " << glGetError() << endl;
-    glCheckError();
+    /*cout << "before mainloop | error code: " << glGetError() << endl;
+    glCheckError();*/
 
     // start lamp sending thread
     //auto three_seconds = 3s;
@@ -358,7 +364,7 @@ void sendLamp(float dt) {
 
     randZ *= altInt;
     altInt = altInt * -1; // flip altInt
-    cout << randZ << " : " << altInt << " : " << randZ << endl;
+    //cout << randZ << " : " << altInt << " : " << randZ << endl;
 
     Lamp newLamp;
     newLamp = Lamp(vec3(1.0f, 1.0f, 1.0f), // light color
@@ -377,8 +383,6 @@ void sendLamp(float dt) {
     // sleep, then call another lamp
     //this_thread::sleep_for(3000ms);
     //sendLamp(dt);
-    
-    
 }
 
 void processInput(double dt)
@@ -421,6 +425,11 @@ void processInput(double dt)
     // send lamp across stage
     if (Keyboard::keyWentDown(GLFW_KEY_Z)) {
         sendLamp(dt);
+    }
+
+    // test MyMalloc
+    if (Keyboard::keyWentDown(GLFW_KEY_X)) {
+        myMalloc.alloc();
     }
 
     // camera look

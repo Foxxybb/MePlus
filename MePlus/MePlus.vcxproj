@@ -132,6 +132,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\algorithms\MyMalloc.cpp" />
     <ClCompile Include="src\physics\environment.cpp" />
     <ClCompile Include="src\physics\rigidbody.cpp" />
     <ClCompile Include="src\graphics\Light.cpp" />
@@ -157,6 +158,7 @@
     <None Include="glfw3.dll" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\algorithms\MyMalloc.h" />
     <ClInclude Include="src\graphics\models\block.hpp" />
     <ClInclude Include="src\physics\environment.h" />
     <ClInclude Include="src\physics\rigidbody.h" />

@@ -1,11 +1,14 @@
-﻿  main.cpp
+﻿  MyMalloc.cpp
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\algorithms\MyMalloc.cpp(3,10): warning C4067: unexpected tokens following preprocessor directive - expected a newline
+  main.cpp
 C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\graphics\models\cube.hpp(68,36): warning C4018: '<': signed/unsigned mismatch
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(74,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(201,26): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(202,21): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(240,54): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(77,10): warning C4101: 'infoLog': unreferenced local variable
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(76,9): warning C4101: 'success': unreferenced local variable
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(418,20): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(423,18): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(79,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(207,26): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(208,21): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(246,54): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(85,10): warning C4101: 'infoLog': unreferenced local variable
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(84,9): warning C4101: 'success': unreferenced local variable
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(422,20): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(427,18): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+  Generating Code...
   MePlus.vcxproj -> C:\Users\leetl\Documents\GitHub\MePlus\x64\Debug\MePlus.exe
