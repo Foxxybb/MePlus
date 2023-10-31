@@ -18,26 +18,37 @@ void MyMalloc::alloc() {
 
 	// generate a random int 0-7 as index to place data in
 	int dataIdx = rand() % 8;
-	int firstIdx = dataIdx;
+
+	cout << dataSize << " : " << dataIdx << endl;
+
+	// test function with single int placements
+	//placeSingle(dataSize, dataIdx);
+
+	placeDataBlock(dataSize, dataIdx);
+}
+
+// attempt to place single int at desired index, if no space, try next index until full rotation
+void MyMalloc::placeSingle(int size, int idx) {
+	int firstIdx = idx;
 
 	// loop finding index to place
 	while (true) {
 		// if placing index == 0, place the data
-		if (memArray[dataIdx] == 0) {
-			memArray[dataIdx] = dataSize;
-			cout << "placing " << dataSize << " : at " << dataIdx << endl;
+		if (memArr[idx] == 0) {
+			memArr[idx] = size;
+			cout << "placing " << size << " : at " << idx << endl;
 			break;
 		}
 		else {
 			// else, try next index
-			dataIdx++;
+			idx++;
 			// if dataIdx > 7, reset to 0
-			if (dataIdx > 7) { dataIdx = 0; }
+			if (idx > 7) { idx = 0; }
 		}
 
 		// break loop if full rotation occurs
-		if (dataIdx == firstIdx) {
-			cout << "Attempted to place " << dataSize << " at " << dataIdx << endl;
+		if (idx == firstIdx) {
+			cout << "Attempted to place " << size << " at " << idx << endl;
 			cout << "Insufficient space in array." << endl;
 			break;
 		}
@@ -45,7 +56,44 @@ void MyMalloc::alloc() {
 
 	// print status of memArray
 	for (int i = 0; i < 8; i++) {
-		cout << memArray[i] << ", ";
+		cout << memArr[i] << ", ";
 	}
 	cout << endl;
 }
+
+// attempt to place integer at index, then place additional integers for size int along array
+// if end of array is reached, loop back to 0
+// if insufficient space, move along array and check for space until full rotation
+void MyMalloc::placeDataBlock(int size, int idx) {
+	int firstIdx = idx; // used to break loop 
+
+	// loop finding index to place
+	while (true) {
+		// check if target index is empty
+		if (spaceAvailable(size, idx)) {
+			// place data block
+		}
+		else {
+			// else, try next index
+			idx++;
+			// if dataIdx > 7, reset to 0
+			if (idx > 7) { idx = 0; }
+		}
+
+		// break loop if full rotation occurs
+		if (idx == firstIdx) {
+			cout << "Attempted to place " << size << " at " << idx << endl;
+			cout << "Insufficient space in array." << endl;
+			break;
+		}
+	}
+}
+
+bool MyMalloc::spaceAvailable(int size, int idx) {
+
+	// based on input, make list of indexes to check if they are empty
+
+
+	return false;
+}
+

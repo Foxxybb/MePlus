@@ -2,7 +2,7 @@
 class MyMalloc
 {
 public:
-	unsigned int memArray[8];
+	unsigned int memArr[8];
 
 	// constructor
 	MyMalloc();
@@ -10,6 +10,11 @@ public:
 	// generate a data block to be inserted into the memArray
 	void alloc();
 
+	void placeSingle(int size, int idx);
+
+	void placeDataBlock(int size, int idx);
+
+	bool spaceAvailable(int size, int idx);
 
 };
 
