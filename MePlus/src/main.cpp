@@ -30,6 +30,7 @@
 #include "graphics/models/gun.hpp"
 #include "graphics/models/ico.hpp"
 #include "graphics/models/block.hpp"
+#include "graphics/models/stage.hpp"
 
 #include "physics/environment.h"
 
@@ -132,6 +133,11 @@ int main() {
     myBlock.size = vec3(5.0f);
     myBlock.rb.pos = vec3(0.0f, -5.0f, 0.0f);
 
+    Stage myStage;
+    myStage.init();
+    myStage.size = vec3(1.0f);
+    myStage.rb.pos = vec3(0.0f);
+
     Ico myIco;
     myIco.init();
 
@@ -141,24 +147,6 @@ int main() {
         glm::vec4(0.4f, 0.4f, 0.4f, 1.0f), 
         glm::vec4(0.75f,0.75f,0.75f,1.0f) 
     };
-
-    /*glm::vec3 pointLightPositions[] = {
-            glm::vec3(0.7f,  0.2f,  2.0f),
-            glm::vec3(2.3f, -3.3f, -4.0f),
-            glm::vec3(-4.0f,  2.0f, -1.0f),
-            glm::vec3(0.0f,  0.0f, -3.0f)
-    };*/
-
-    /*Lamp lamps[4];
-    for (unsigned int i = 0; i < 4; i++) {
-        lamps[i] = Lamp(glm::vec3(1.0f),
-            glm::vec4(0.05f, 0.05f, 0.05f, 1.0f),
-            glm::vec4(0.8f, 0.8f, 0.8f, 1.0f),
-            glm::vec4(1.0f, 1.0f, 1.0f, 1.0f),
-            1.0f, 0.07f, 0.032f,
-            pointLightPositions[i], glm::vec3(0.25f));
-        lamps[i].init();
-    }*/
 
     // flashlight
     SpotLight s = {
@@ -288,6 +276,7 @@ int main() {
 
         //myIco.render(shader, dt);
         myBlock.render(shader, dt);
+        myStage.render(shader, dt);
         //myCube.render(shader, dt);
 
         lampShader.activate();
@@ -314,6 +303,7 @@ int main() {
     }
     //myIco.cleanup();
     myBlock.cleanup();
+    myStage.cleanup();
 
     for (Lamp lamp : sentLamps) {
         lamp.cleanup();

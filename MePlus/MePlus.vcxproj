@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClInclude Include="src\algorithms\MyMalloc.h" />
     <ClInclude Include="src\graphics\models\block.hpp" />
+    <ClInclude Include="src\graphics\models\stage.hpp" />
     <ClInclude Include="src\physics\environment.h" />
     <ClInclude Include="src\physics\rigidbody.h" />
     <ClInclude Include="src\graphics\Light.h" />
