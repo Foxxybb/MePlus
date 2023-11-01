@@ -1,4 +1,7 @@
-#pragma once
+#include <list>
+
+using namespace std;
+
 class MyMalloc
 {
 public:
@@ -14,7 +17,7 @@ public:
 
 	void placeDataBlock(int size, int idx);
 
-	bool spaceAvailable(int size, int idx);
+	list<int> spaceAvailable(int size, int idx);
 
 };
 
