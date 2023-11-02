@@ -43,9 +43,37 @@
 			"name":"Material",
 			"pbrMetallicRoughness":{
 				"baseColorFactor":[
-					0.978376567363739,
+					0.03458644822239876,
+					0.06347352266311646,
 					1,
-					0.04541940242052078,
+					1
+				],
+				"metallicFactor":0,
+				"roughnessFactor":0.5
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Material.002",
+			"pbrMetallicRoughness":{
+				"baseColorFactor":[
+					0.800000011920929,
+					0.800000011920929,
+					0.800000011920929,
+					1
+				],
+				"metallicFactor":0,
+				"roughnessFactor":0.5
+			}
+		},
+		{
+			"doubleSided":true,
+			"name":"Material.003",
+			"pbrMetallicRoughness":{
+				"baseColorFactor":[
+					0.6,
+					0.6,
+					0.6,
 					1
 				],
 				"metallicFactor":0,
@@ -65,6 +93,24 @@
 					},
 					"indices":3,
 					"material":0
+				},
+				{
+					"attributes":{
+						"POSITION":4,
+						"NORMAL":5,
+						"TEXCOORD_0":6
+					},
+					"indices":7,
+					"material":1
+				},
+				{
+					"attributes":{
+						"POSITION":8,
+						"NORMAL":9,
+						"TEXCOORD_0":10
+					},
+					"indices":11,
+					"material":2
 				}
 			]
 		}
@@ -73,7 +119,7 @@
 		{
 			"bufferView":0,
 			"componentType":5126,
-			"count":734,
+			"count":754,
 			"max":[
 				1,
 				0.9999999403953552,
@@ -89,51 +135,167 @@
 		{
 			"bufferView":1,
 			"componentType":5126,
-			"count":734,
+			"count":754,
 			"type":"VEC3"
 		},
 		{
 			"bufferView":2,
 			"componentType":5126,
-			"count":734,
+			"count":754,
 			"type":"VEC2"
 		},
 		{
 			"bufferView":3,
 			"componentType":5123,
-			"count":1560,
+			"count":1584,
+			"type":"SCALAR"
+		},
+		{
+			"bufferView":4,
+			"componentType":5126,
+			"count":16,
+			"max":[
+				0.8600866198539734,
+				0.9421467185020447,
+				0.8600866198539734
+			],
+			"min":[
+				-0.8600866198539734,
+				0.9421467185020447,
+				-0.8600866198539734
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":5,
+			"componentType":5126,
+			"count":16,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":6,
+			"componentType":5126,
+			"count":16,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":7,
+			"componentType":5123,
+			"count":24,
+			"type":"SCALAR"
+		},
+		{
+			"bufferView":8,
+			"componentType":5126,
+			"count":32,
+			"max":[
+				0.8600866198539734,
+				0.9421467185020447,
+				0.8600866198539734
+			],
+			"min":[
+				-0.8600866198539734,
+				0.9020640850067139,
+				-0.8600866198539734
+			],
+			"type":"VEC3"
+		},
+		{
+			"bufferView":9,
+			"componentType":5126,
+			"count":32,
+			"type":"VEC3"
+		},
+		{
+			"bufferView":10,
+			"componentType":5126,
+			"count":32,
+			"type":"VEC2"
+		},
+		{
+			"bufferView":11,
+			"componentType":5123,
+			"count":48,
 			"type":"SCALAR"
 		}
 	],
 	"bufferViews":[
 		{
 			"buffer":0,
-			"byteLength":8808,
+			"byteLength":9048,
 			"byteOffset":0,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":8808,
-			"byteOffset":8808,
+			"byteLength":9048,
+			"byteOffset":9048,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":5872,
-			"byteOffset":17616,
+			"byteLength":6032,
+			"byteOffset":18096,
 			"target":34962
 		},
 		{
 			"buffer":0,
-			"byteLength":3120,
-			"byteOffset":23488,
+			"byteLength":3168,
+			"byteOffset":24128,
+			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":192,
+			"byteOffset":27296,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":192,
+			"byteOffset":27488,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":128,
+			"byteOffset":27680,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":48,
+			"byteOffset":27808,
+			"target":34963
+		},
+		{
+			"buffer":0,
+			"byteLength":384,
+			"byteOffset":27856,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":384,
+			"byteOffset":28240,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":256,
+			"byteOffset":28624,
+			"target":34962
+		},
+		{
+			"buffer":0,
+			"byteLength":96,
+			"byteOffset":28880,
 			"target":34963
 		}
 	],
 	"buffers":[
 		{
-			"byteLength":26608,
+			"byteLength":28976,
 			"uri":"blockStage.bin"
 		}
 	]

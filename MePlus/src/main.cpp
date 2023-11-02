@@ -31,6 +31,7 @@
 #include "graphics/models/ico.hpp"
 #include "graphics/models/block.hpp"
 #include "graphics/models/stage.hpp"
+#include "graphics/models/data.hpp"
 
 #include "physics/environment.h"
 
@@ -49,7 +50,7 @@ void processInput(double dt);
 void sendLamp(float dt);
 
 Camera camera(glm::vec3(0.0f, 0.0f, 0.0f));
-Camera Camera::defaultCamera(vec3(-8.0f, 8.0f, 0.0f));
+Camera Camera::defaultCamera(vec3(-10.0f, 6.0f, 0.0f));
 
 float dt = 0.0f; // time between frames
 float lastFrame = 0.0f; // time of last frame
@@ -57,7 +58,8 @@ int altInt = 1; // used to flip + and - with RNG
 
 bool flashLightOn = false;
 
-unsigned int SCR_WIDTH = 800, SCR_HEIGHT = 600;
+//unsigned int SCR_WIDTH = 800, SCR_HEIGHT = 600;
+unsigned int SCR_WIDTH = 1280, SCR_HEIGHT = 720;
 float theta = 45.0f;
 
 //Ico ico(vec3(0.0f), vec3(0.25f));
@@ -78,9 +80,6 @@ int main() {
 
     // seed RNG
     srand(time(NULL));
-
-    // MyMalloc test
-    //myMalloc.alloc();
 
     int success;
     char infoLog[512];
@@ -127,16 +126,34 @@ int main() {
     //Gun g;
     //g.loadModel("assets/models/scene.gltf");
 
+    // positions for data cubes
+    vec3 dataCubePos[8] = {
+        vec3(3.2f, 1.0f, 1.0f), //0
+        vec3(1.2f, 1.0f, 3.2f), //1
+        vec3(-1.2f, 1.0f, 3.2f), //2
+        vec3(-3.2f, 1.0f, 1.0f), //3
+        vec3(-3.2f, 1.0f, -1.0f), //4
+        vec3(-1.2f, 1.0f, -3.2f), //5
+        vec3(1.2f, 1.0f, -3.2f), //6
+        vec3(3.2f, 1.0f, -1.0f) //7
+    };
+
     // stage block
-    Block myBlock;
+    /*Block myBlock;
     myBlock.init();
     myBlock.size = vec3(5.0f);
-    myBlock.rb.pos = vec3(0.0f, -5.0f, 0.0f);
+    myBlock.rb.pos = vec3(0.0f, -5.0f, 0.0f);*/
+    // data cube
+    Data testData;
+    testData.init();
+    testData.size = vec3(0.7f);
+    testData.rb.pos = vec3(-1.2f, 1.0f, 3.2f);
 
+    // new stage block
     Stage myStage;
     myStage.init();
-    myStage.size = vec3(1.0f);
-    myStage.rb.pos = vec3(0.0f);
+    myStage.size = vec3(5.0f);
+    myStage.rb.pos = vec3(0.0f, -5.0f, 0.0f);
 
     Ico myIco;
     myIco.init();
@@ -169,13 +186,7 @@ int main() {
     //);
     //testLamp.init();
 
-    // set cube at center of world
-    /*Cube myCube;
-    myCube = Cube(vec3(0.0f), vec3(0.5f));
-    myCube.material = Material::brass;
-    myCube.init();*/
-
-    camera.defaultCamera.updateCameraDirection(0.0f, -50.0f); // looking down at the stage
+    camera.defaultCamera.updateCameraDirection(0.0f, -30.0f); // looking down at the stage
 
     // ERROR CHECK
     /*cout << "before mainloop | error code: " << glGetError() << endl;
@@ -185,7 +196,7 @@ int main() {
     //auto three_seconds = 3s;
     //thread (sendLamp, dt).detach();
     float lampTimer = 0.0f;
-    float lampTimerIncrement = 3.0f;
+    float lampTimerIncrement = 2.0f;
 
     // MAIN LOOP===============================================================================
     while (!screen.shouldClose())
@@ -195,6 +206,7 @@ int main() {
         dt = currentTime - lastFrame;
         lastFrame = currentTime;
 
+        // code to send lamps every few seconds
         // if currentTime exceeds lampTimer, fire sendLamp() and extend timer
         if (currentTime > lampTimer) {
             sendLamp(dt);
@@ -275,8 +287,11 @@ int main() {
         }
 
         //myIco.render(shader, dt);
-        myBlock.render(shader, dt);
+        //myBlock.render(shader, dt);
+        
         myStage.render(shader, dt);
+        testData.render(shader, dt);
+        
         //myCube.render(shader, dt);
 
         lampShader.activate();
@@ -302,8 +317,9 @@ int main() {
         ico.cleanup();
     }
     //myIco.cleanup();
-    myBlock.cleanup();
+    //myBlock.cleanup();
     myStage.cleanup();
+    testData.cleanup();
 
     for (Lamp lamp : sentLamps) {
         lamp.cleanup();

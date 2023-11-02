@@ -1,11 +1,11 @@
 ﻿  main.cpp
 C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\graphics\models\cube.hpp(68,36): warning C4018: '<': signed/unsigned mismatch
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(80,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(195,26): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(196,21): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(234,54): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(86,10): warning C4101: 'infoLog': unreferenced local variable
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(85,9): warning C4101: 'success': unreferenced local variable
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(412,20): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(417,18): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(82,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(206,26): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(207,21): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(246,54): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(85,10): warning C4101: 'infoLog': unreferenced local variable
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(84,9): warning C4101: 'success': unreferenced local variable
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(428,20): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(433,18): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   MePlus.vcxproj -> C:\Users\leetl\Documents\GitHub\MePlus\x64\Debug\MePlus.exe

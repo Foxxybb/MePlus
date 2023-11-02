@@ -3,8 +3,10 @@
 #include "Keyboard.h"
 #include "Mouse.h"
 
-unsigned int Screen::SCR_WIDTH = 800;
-unsigned int Screen::SCR_HEIGHT = 600;
+//unsigned int Screen::SCR_WIDTH = 800;
+//unsigned int Screen::SCR_HEIGHT = 600;
+unsigned int Screen::SCR_WIDTH = 1280;
+unsigned int Screen::SCR_HEIGHT = 720;
 
 void Screen::framebufferSizeCallback(GLFWwindow* window, int width, int height) {
 	glViewport(0, 0, width, height);
