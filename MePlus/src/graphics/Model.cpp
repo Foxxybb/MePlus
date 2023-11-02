@@ -12,7 +12,6 @@ Model::Model(vec3 pos, vec3 size, bool noTex)
 	//rb.acceleration = Environment::gravitationalAcceleration;
 }
 
-
 void Model::init() { }
 
 void Model::render(Shader shader, float dt, bool setModel) {

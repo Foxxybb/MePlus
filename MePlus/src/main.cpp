@@ -71,6 +71,32 @@ Screen screen;
 
 MyMalloc myMalloc;
 
+Data testData;
+
+// positions for data cubes
+vec3 dataCubePos[8] = {
+    vec3(3.2f, 1.0f, 1.0f), //0
+    vec3(1.2f, 1.0f, 3.2f), //1
+    vec3(-1.2f, 1.0f, 3.2f), //2
+    vec3(-3.2f, 1.0f, 1.0f), //3
+    vec3(-3.2f, 1.0f, -1.0f), //4
+    vec3(-1.2f, 1.0f, -3.2f), //5
+    vec3(1.2f, 1.0f, -3.2f), //6
+    vec3(3.2f, 1.0f, -1.0f) //7
+};
+
+// positions for data cubes being placed
+vec3 dataCubeRaisedPos[8] = {
+    vec3(3.2f, 3.0f, 1.0f), //0
+    vec3(1.2f, 3.0f, 3.2f), //1
+    vec3(-1.2f, 3.0f, 3.2f), //2
+    vec3(-3.2f, 3.0f, 1.0f), //3
+    vec3(-3.2f, 3.0f, -1.0f), //4
+    vec3(-1.2f, 3.0f, -3.2f), //5
+    vec3(1.2f, 3.0f, -3.2f), //6
+    vec3(3.2f, 3.0f, -1.0f) //7
+};
+
 GLenum glCheckError_(const char* file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__);
 
@@ -126,28 +152,19 @@ int main() {
     //Gun g;
     //g.loadModel("assets/models/scene.gltf");
 
-    // positions for data cubes
-    vec3 dataCubePos[8] = {
-        vec3(3.2f, 1.0f, 1.0f), //0
-        vec3(1.2f, 1.0f, 3.2f), //1
-        vec3(-1.2f, 1.0f, 3.2f), //2
-        vec3(-3.2f, 1.0f, 1.0f), //3
-        vec3(-3.2f, 1.0f, -1.0f), //4
-        vec3(-1.2f, 1.0f, -3.2f), //5
-        vec3(1.2f, 1.0f, -3.2f), //6
-        vec3(3.2f, 1.0f, -1.0f) //7
-    };
+    
 
     // stage block
     /*Block myBlock;
     myBlock.init();
     myBlock.size = vec3(5.0f);
     myBlock.rb.pos = vec3(0.0f, -5.0f, 0.0f);*/
+
     // data cube
-    Data testData;
+    //Data testData;
     testData.init();
     testData.size = vec3(0.7f);
-    testData.rb.pos = vec3(-1.2f, 1.0f, 3.2f);
+    testData.rb.pos = vec3(0.0f, 3.0f, 0.0f);
 
     // new stage block
     Stage myStage;
@@ -227,7 +244,10 @@ int main() {
             glm::vec4(dirLight.direction, 1.0f));
         dirLight.render(shader);
 
-        //myLamp.rb.velocity = vec3(1.0f);
+        // check for position of testdata, check a range to prevent overshooting
+        if (testData.rb.pos == testData.targetPos) {
+            testData.rb.velocity = vec3(0.0f);
+        }
 
         // render lamps
         /*for (int i = 0; i < 4; i++) {
@@ -436,6 +456,17 @@ void processInput(double dt)
     // test MyMalloc
     if (Keyboard::keyWentDown(GLFW_KEY_X)) {
         myMalloc.alloc();
+    }
+
+    // test dataMove
+    if (Keyboard::keyWentDown(GLFW_KEY_C)) {
+        //testData.rb.pos = dataCubePos[0];
+        //testData.rb.velocity = vec3(0.0f);
+
+        // get vector between current position and target
+        testData.targetPos = dataCubePos[0];
+        vec3 movementVector = dataCubePos[0] - testData.rb.pos;
+        testData.rb.velocity = movementVector;
     }
 
     // camera look

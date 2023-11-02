@@ -17,10 +17,13 @@
 
 #include "../physics/rigidbody.h"
 
+using namespace glm;
+
 class Model {
 public:
 	RigidBody rb;
-	glm::vec3 size;
+	vec3 size;
+	vec3 targetPos;
 
 	Model(glm::vec3 pos = glm::vec3(0.0f), glm::vec3 size = glm::vec3(1.0f), bool noTex = false);
 
