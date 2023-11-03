@@ -244,9 +244,19 @@ int main() {
             glm::vec4(dirLight.direction, 1.0f));
         dirLight.render(shader);
 
-        // check for position of testdata, check a range to prevent overshooting
-        if (testData.rb.pos == testData.targetPos) {
-            testData.rb.velocity = vec3(0.0f);
+
+        // POSITION CHECK ==================================================================================================
+        // check for position of testdata, check a range to prevent overshooting   
+        // check range for x,y,z of position
+        // if range is within 0.1f if target, snap to target position and set velocity to 0
+        if (testData.rb.pos != testData.targetPos) {
+            if ((testData.rb.pos.x > (testData.targetPos.x - 0.1f)) && (testData.rb.pos.x < (testData.targetPos.x + 0.1f))
+                && (testData.rb.pos.y > (testData.targetPos.y - 0.1f)) && (testData.rb.pos.y < (testData.targetPos.y + 0.1f))
+                && (testData.rb.pos.z > (testData.targetPos.z - 0.1f)) && (testData.rb.pos.z < (testData.targetPos.z + 0.1f)))
+            {
+                testData.rb.velocity = vec3(0.0f);
+                testData.rb.pos = testData.targetPos;
+            }
         }
 
         // render lamps
@@ -460,12 +470,16 @@ void processInput(double dt)
 
     // test dataMove
     if (Keyboard::keyWentDown(GLFW_KEY_C)) {
-        //testData.rb.pos = dataCubePos[0];
-        //testData.rb.velocity = vec3(0.0f);
-
         // get vector between current position and target
         testData.targetPos = dataCubePos[0];
         vec3 movementVector = dataCubePos[0] - testData.rb.pos;
+        testData.rb.velocity = movementVector;
+    }
+
+    if (Keyboard::keyWentDown(GLFW_KEY_V)) {
+        // get vector between current position and target
+        testData.targetPos = dataCubePos[4];
+        vec3 movementVector = dataCubePos[4] - testData.rb.pos;
         testData.rb.velocity = movementVector;
     }
 
