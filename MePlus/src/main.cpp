@@ -73,29 +73,7 @@ MyMalloc myMalloc;
 
 Data testData;
 
-// positions for data cubes
-vec3 dataCubePos[8] = {
-    vec3(3.2f, 1.0f, 1.0f), //0
-    vec3(1.2f, 1.0f, 3.2f), //1
-    vec3(-1.2f, 1.0f, 3.2f), //2
-    vec3(-3.2f, 1.0f, 1.0f), //3
-    vec3(-3.2f, 1.0f, -1.0f), //4
-    vec3(-1.2f, 1.0f, -3.2f), //5
-    vec3(1.2f, 1.0f, -3.2f), //6
-    vec3(3.2f, 1.0f, -1.0f) //7
-};
 
-// positions for data cubes being placed
-vec3 dataCubeRaisedPos[8] = {
-    vec3(3.2f, 3.0f, 1.0f), //0
-    vec3(1.2f, 3.0f, 3.2f), //1
-    vec3(-1.2f, 3.0f, 3.2f), //2
-    vec3(-3.2f, 3.0f, 1.0f), //3
-    vec3(-3.2f, 3.0f, -1.0f), //4
-    vec3(-1.2f, 3.0f, -3.2f), //5
-    vec3(1.2f, 3.0f, -3.2f), //6
-    vec3(3.2f, 3.0f, -1.0f) //7
-};
 
 GLenum glCheckError_(const char* file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__);
@@ -152,8 +130,6 @@ int main() {
     //Gun g;
     //g.loadModel("assets/models/scene.gltf");
 
-    
-
     // stage block
     /*Block myBlock;
     myBlock.init();
@@ -165,6 +141,7 @@ int main() {
     testData.init();
     testData.size = vec3(0.7f);
     testData.rb.pos = vec3(0.0f, 3.0f, 0.0f);
+    //myMalloc.dataCubes.push_back(testData);
 
     // new stage block
     Stage myStage;
@@ -258,12 +235,7 @@ int main() {
                 testData.rb.pos = testData.targetPos;
             }
         }
-
-        // render lamps
-        /*for (int i = 0; i < 4; i++) {
-            lamps[i].pointLight.render(shader, i);
-        }
-        shader.setInt("noPointLights", 4);*/
+        //myMalloc.positionCheck();
 
         // RENDER LIGHTS ===========================================
         //testLamp.pointLight.render(shader, 0);
@@ -321,8 +293,10 @@ int main() {
         
         myStage.render(shader, dt);
         testData.render(shader, dt);
-        
-        //myCube.render(shader, dt);
+
+        //for (auto dataCube : myMalloc.dataCubes) {
+        //    //dataCube.render(shader, dt);
+        //}
 
         lampShader.activate();
         lampShader.setMat4("view", view);
@@ -346,19 +320,17 @@ int main() {
     for (Ico ico : launchObjects) {
         ico.cleanup();
     }
-    //myIco.cleanup();
-    //myBlock.cleanup();
+
     myStage.cleanup();
     testData.cleanup();
+
+    /*for (auto dataCube : myMalloc.dataCubes) {
+        dataCube.cleanup();
+    }*/
 
     for (Lamp lamp : sentLamps) {
         lamp.cleanup();
     }
-
-    /*for (int i = 0; i < 4; i++) {
-        lamps[i].cleanup();
-    }*/
-    //testLamp.cleanup();
 
     glfwTerminate();
 	return 0;
@@ -471,15 +443,15 @@ void processInput(double dt)
     // test dataMove
     if (Keyboard::keyWentDown(GLFW_KEY_C)) {
         // get vector between current position and target
-        testData.targetPos = dataCubePos[0];
-        vec3 movementVector = dataCubePos[0] - testData.rb.pos;
+        testData.targetPos = myMalloc.dataCubePos[0];
+        vec3 movementVector = myMalloc.dataCubePos[0] - testData.rb.pos;
         testData.rb.velocity = movementVector;
     }
 
     if (Keyboard::keyWentDown(GLFW_KEY_V)) {
         // get vector between current position and target
-        testData.targetPos = dataCubePos[4];
-        vec3 movementVector = dataCubePos[4] - testData.rb.pos;
+        testData.targetPos = myMalloc.dataCubePos[4];
+        vec3 movementVector = myMalloc.dataCubePos[4] - testData.rb.pos;
         testData.rb.velocity = movementVector;
     }
 

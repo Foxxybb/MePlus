@@ -139,3 +139,24 @@ list<int> MyMalloc::spaceAvailable(int size, int idx) {
 
 	return idxList;
 }
+
+// for each dataCube, check if the dataCube is at its target position (within 0.1f range)
+// if so, snap the dataCube to the target position and set velocity to 0
+void MyMalloc::positionCheck() {
+
+	/*for (auto dataCube : dataCubes) {
+		cout << dataCube.rb.pos.x << endl;
+	}*/
+
+	for (auto dataCube : dataCubes) {
+		if (dataCube.rb.pos != dataCube.targetPos) {
+			if ((dataCube.rb.pos.x > (dataCube.targetPos.x - 0.1f)) && (dataCube.rb.pos.x < (dataCube.targetPos.x + 0.1f))
+				&& (dataCube.rb.pos.y > (dataCube.targetPos.y - 0.1f)) && (dataCube.rb.pos.y < (dataCube.targetPos.y + 0.1f))
+				&& (dataCube.rb.pos.z > (dataCube.targetPos.z - 0.1f)) && (dataCube.rb.pos.z < (dataCube.targetPos.z + 0.1f)))
+			{
+				dataCube.rb.velocity = vec3(0.0f);
+				dataCube.rb.pos = dataCube.targetPos;
+			}
+		}
+	}
+}
