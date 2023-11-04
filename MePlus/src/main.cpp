@@ -65,6 +65,7 @@ float theta = 45.0f;
 //Ico ico(vec3(0.0f), vec3(0.25f));
 vector<Ico> launchObjects;
 vector<Lamp> sentLamps;
+//vector<Data> dataCubes;
 unsigned int numPointLights = 1;
 
 Screen screen;
@@ -73,7 +74,8 @@ MyMalloc myMalloc;
 
 Data testData;
 
-
+// list of dataCubes that need to be moved around
+//list<Data> dataCubes;
 
 GLenum glCheckError_(const char* file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__);
@@ -118,30 +120,27 @@ int main() {
     // Z BUFFER
     glEnable(GL_DEPTH_TEST);
 
-    // ERROR CHECK
-    /*cout << "before shaders | error code: " << glGetError() << endl;
-    glCheckError();*/
-
     // SHADERS====================================================================
     Shader shader("assets/object.vs", "assets/object.fs");
     Shader lampShader("assets/object.vs", "assets/lamp.fs");
 
     // MODELS=====================================================================
-    //Gun g;
-    //g.loadModel("assets/models/scene.gltf");
 
-    // stage block
-    /*Block myBlock;
-    myBlock.init();
-    myBlock.size = vec3(5.0f);
-    myBlock.rb.pos = vec3(0.0f, -5.0f, 0.0f);*/
+    // fill dataCube list
+    myMalloc.dataCubes.push_back(testData);
+
+    // initialize each cube in the dataCubes list
+    for (Data &dataCube : myMalloc.dataCubes) {
+        dataCube.init();
+        dataCube.size = vec3(0.7f);
+        dataCube.rb.pos = vec3(0.0f, 3.0f, 0.0f);
+    }
 
     // data cube
     //Data testData;
-    testData.init();
+    /*testData.init();
     testData.size = vec3(0.7f);
-    testData.rb.pos = vec3(0.0f, 3.0f, 0.0f);
-    //myMalloc.dataCubes.push_back(testData);
+    testData.rb.pos = vec3(0.0f, 3.0f, 0.0f);*/
 
     // new stage block
     Stage myStage;
@@ -221,12 +220,11 @@ int main() {
             glm::vec4(dirLight.direction, 1.0f));
         dirLight.render(shader);
 
-
         // POSITION CHECK ==================================================================================================
         // check for position of testdata, check a range to prevent overshooting   
         // check range for x,y,z of position
         // if range is within 0.1f if target, snap to target position and set velocity to 0
-        if (testData.rb.pos != testData.targetPos) {
+        /*if (testData.rb.pos != testData.targetPos) {
             if ((testData.rb.pos.x > (testData.targetPos.x - 0.1f)) && (testData.rb.pos.x < (testData.targetPos.x + 0.1f))
                 && (testData.rb.pos.y > (testData.targetPos.y - 0.1f)) && (testData.rb.pos.y < (testData.targetPos.y + 0.1f))
                 && (testData.rb.pos.z > (testData.targetPos.z - 0.1f)) && (testData.rb.pos.z < (testData.targetPos.z + 0.1f)))
@@ -234,8 +232,19 @@ int main() {
                 testData.rb.velocity = vec3(0.0f);
                 testData.rb.pos = testData.targetPos;
             }
-        }
-        //myMalloc.positionCheck();
+        }*/
+        /*for (Data &dataCube : myMalloc.dataCubes) {
+            if (dataCube.rb.pos != dataCube.targetPos) {
+                if ((dataCube.rb.pos.x > (dataCube.targetPos.x - 0.1f)) && (dataCube.rb.pos.x < (dataCube.targetPos.x + 0.1f))
+                    && (dataCube.rb.pos.y > (dataCube.targetPos.y - 0.1f)) && (dataCube.rb.pos.y < (dataCube.targetPos.y + 0.1f))
+                    && (dataCube.rb.pos.z > (dataCube.targetPos.z - 0.1f)) && (dataCube.rb.pos.z < (dataCube.targetPos.z + 0.1f)))
+                {
+                    dataCube.rb.velocity = vec3(0.0f);
+                    dataCube.rb.pos = dataCube.targetPos;
+                }
+            }
+        }*/
+        myMalloc.positionCheck();
 
         // RENDER LIGHTS ===========================================
         //testLamp.pointLight.render(shader, 0);
@@ -292,7 +301,10 @@ int main() {
         //myBlock.render(shader, dt);
         
         myStage.render(shader, dt);
-        testData.render(shader, dt);
+        //testData.render(shader, dt);
+        for (Data &dataCube : myMalloc.dataCubes) {
+            dataCube.render(shader,dt);
+        }
 
         //for (auto dataCube : myMalloc.dataCubes) {
         //    //dataCube.render(shader, dt);
@@ -322,11 +334,11 @@ int main() {
     }
 
     myStage.cleanup();
-    testData.cleanup();
+    //testData.cleanup();
 
-    /*for (auto dataCube : myMalloc.dataCubes) {
+    for (Data dataCube : myMalloc.dataCubes) {
         dataCube.cleanup();
-    }*/
+    }
 
     for (Lamp lamp : sentLamps) {
         lamp.cleanup();
@@ -443,16 +455,21 @@ void processInput(double dt)
     // test dataMove
     if (Keyboard::keyWentDown(GLFW_KEY_C)) {
         // get vector between current position and target
-        testData.targetPos = myMalloc.dataCubePos[0];
+        /*testData.targetPos = myMalloc.dataCubePos[0];
         vec3 movementVector = myMalloc.dataCubePos[0] - testData.rb.pos;
-        testData.rb.velocity = movementVector;
+        testData.rb.velocity = movementVector;*/
+        for (Data &dataCube : myMalloc.dataCubes) {
+            dataCube.targetPos = myMalloc.dataCubePos[0];
+            dataCube.rb.velocity = myMalloc.dataCubePos[0] - dataCube.rb.pos;
+        }
     }
 
     if (Keyboard::keyWentDown(GLFW_KEY_V)) {
         // get vector between current position and target
-        testData.targetPos = myMalloc.dataCubePos[4];
-        vec3 movementVector = myMalloc.dataCubePos[4] - testData.rb.pos;
-        testData.rb.velocity = movementVector;
+        for (Data &dataCube : myMalloc.dataCubes) {
+            dataCube.targetPos = myMalloc.dataCubePos[4];
+            dataCube.rb.velocity = myMalloc.dataCubePos[4] - dataCube.rb.pos;
+        }
     }
 
     // camera look

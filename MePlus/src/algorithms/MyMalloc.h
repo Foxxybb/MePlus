@@ -10,7 +10,7 @@ class MyMalloc
 {
 public:
 	unsigned int memArr[8]; // memory array that is represented by data cubes
-    list<Data> dataCubes; // list of data cube models
+    vector<Data> dataCubes; // list of data cube models
 
     // positions for data cubes "in" the array
     vec3 dataCubePos[8] = {
