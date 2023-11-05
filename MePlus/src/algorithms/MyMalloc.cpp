@@ -174,10 +174,10 @@ void MyMalloc::moveCubes() {
 	cout << endl;
 
 	// test movement with direct reference to dataBlocks
-	for (vector<Data> dataBlock : dataBlocks) {
+	for (vector<Data> &dataBlock : dataBlocks) {
 		for (Data &dataCube : dataBlock) {
-			dataCube.targetPos = dataCubeRaisedPos[0];
-			dataCube.rb.velocity = dataCubeRaisedPos[0] - dataCube.rb.pos;
+			dataCube.targetPos = spawnPos;
+			dataCube.rb.velocity = spawnPos - dataCube.rb.pos;
 		}
 	}
 
@@ -207,7 +207,7 @@ void MyMalloc::positionCheck() {
 	}*/
 
 	// position check now occurs for every cube in the 2D vector: dataBlocks
-	for (vector<Data> dataBlock : dataBlocks) {
+	for (vector<Data> &dataBlock : dataBlocks) {
 		for (Data &dataCube : dataBlock) {
 			if (dataCube.rb.pos != dataCube.targetPos) {
 				if ((dataCube.rb.pos.x > (dataCube.targetPos.x - 0.1f)) && (dataCube.rb.pos.x < (dataCube.targetPos.x + 0.1f))

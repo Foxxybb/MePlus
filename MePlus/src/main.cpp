@@ -281,7 +281,7 @@ int main() {
         myStage.render(shader, dt);
         
         // render all cubes held by myMalloc
-        for (vector<Data> dataBlock : myMalloc.dataBlocks) {
+        for (vector<Data> &dataBlock : myMalloc.dataBlocks) {
             for (Data &dataCube : dataBlock) {
                 dataCube.render(shader, dt);
             }
@@ -443,11 +443,7 @@ void processInput(double dt)
 
     // test move
     if (Keyboard::keyWentDown(GLFW_KEY_V)) {
-        // get vector between current position and target
-        /*for (Data &dataCube : myMalloc.dataCubes) {
-            dataCube.targetPos = myMalloc.dataCubePos[4];
-            dataCube.rb.velocity = myMalloc.dataCubePos[4] - dataCube.rb.pos;
-        }*/
+        
         myMalloc.moveCubes();
     }
 
