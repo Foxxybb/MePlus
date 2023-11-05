@@ -71,7 +71,7 @@ void MyMalloc::placeDataBlock(int size, int idx) {
 	// loop finding index to place
 	while (true) {
 		// check if target indices are available
-		list<int> curIdxSpace = spaceAvailable(size, idx);
+		vector<int> curIdxSpace = spaceAvailable(size, idx);
 		
 		if (!curIdxSpace.empty()) {
 			cout << "curIdxSpace: ";
@@ -112,10 +112,10 @@ void MyMalloc::placeDataBlock(int size, int idx) {
 
 // returns list of indices that we are trying to occupy with the current data block
 // if indices are occupied, returns empty list
-list<int> MyMalloc::spaceAvailable(int size, int idx) {
+vector<int> MyMalloc::spaceAvailable(int size, int idx) {
 
 	// based on input, make list of indices to check if they are empty (0)
-	list<int> idxList;
+	vector<int> idxList;
 	idxList.push_back(idx);
 
 	// add all indices that datablock should occupy
@@ -133,18 +133,68 @@ list<int> MyMalloc::spaceAvailable(int size, int idx) {
 	// if they are not all empty, return an empty list
 	for (int memIdx : idxList) {
 		if (memArr[memIdx] != 0) {
-			return list<int>{}; // return empty list if all space isn't fully available
+			return vector<int>{}; // return empty list if all space isn't fully available
 		}
 	}
 
 	return idxList;
 }
 
+// spawn vector of cubes to represent the current datablock
+void MyMalloc::spawnCubes(int size) {
+
+	vector<Data> newVector;
+
+	for (int i = 0; i < size; i++) {
+		Data newData;
+		newData.init();
+		newData.size = vec3(0.7f);
+		//newData.rb.pos = spawnPos;
+		newData.rb.pos = dataCubeRaisedPos[i];
+		newVector.push_back(newData);
+	}
+
+	dataBlocks.push_back(newVector);
+	//currentDataBlock = newVector;
+	//return newVector;
+}
+
+// updates the target position for the currentDataBlock cubes
+void MyMalloc::moveCubes() {
+
+	// for each cube in the current data block, assign the target position, and set velocity
+	// the target position is determined by each available index in the Memory Array
+	// dataCubeRaisedPos[availableIndex]
+	// get list of available indices
+	vector<int> targetSpace = spaceAvailable(3, 0);
+
+	for (auto it = targetSpace.begin(); it !=
+		targetSpace.end(); ++it)
+		cout << ' ' << *it;
+	cout << endl;
+
+	// test movement with direct reference to dataBlocks
+	for (vector<Data> dataBlock : dataBlocks) {
+		for (Data &dataCube : dataBlock) {
+			dataCube.targetPos = dataCubeRaisedPos[0];
+			dataCube.rb.velocity = dataCubeRaisedPos[0] - dataCube.rb.pos;
+		}
+	}
+
+	// this doesn't work, possibly due to reference issue?
+	/*int i = 0;
+	for (Data &dataCube : currentDataBlock) {
+		dataCube.targetPos = dataCubeRaisedPos[targetSpace[i]];
+		dataCube.rb.velocity = dataCube.targetPos - dataCube.rb.pos;
+		i++;
+	}*/
+}
+
 // for each dataCube, check if the dataCube is at its target position (within 0.1f range)
 // if so, snap the dataCube to the target position and set velocity to 0
 void MyMalloc::positionCheck() {
 
-	for (Data &dataCube : dataCubes) {
+	/*for (Data &dataCube : dataCubes) {
 		if (dataCube.rb.pos != dataCube.targetPos) {
 			if ((dataCube.rb.pos.x > (dataCube.targetPos.x - 0.1f)) && (dataCube.rb.pos.x < (dataCube.targetPos.x + 0.1f))
 				&& (dataCube.rb.pos.y > (dataCube.targetPos.y - 0.1f)) && (dataCube.rb.pos.y < (dataCube.targetPos.y + 0.1f))
@@ -152,6 +202,21 @@ void MyMalloc::positionCheck() {
 			{
 				dataCube.rb.velocity = vec3(0.0f);
 				dataCube.rb.pos = dataCube.targetPos;
+			}
+		}
+	}*/
+
+	// position check now occurs for every cube in the 2D vector: dataBlocks
+	for (vector<Data> dataBlock : dataBlocks) {
+		for (Data &dataCube : dataBlock) {
+			if (dataCube.rb.pos != dataCube.targetPos) {
+				if ((dataCube.rb.pos.x > (dataCube.targetPos.x - 0.1f)) && (dataCube.rb.pos.x < (dataCube.targetPos.x + 0.1f))
+					&& (dataCube.rb.pos.y > (dataCube.targetPos.y - 0.1f)) && (dataCube.rb.pos.y < (dataCube.targetPos.y + 0.1f))
+					&& (dataCube.rb.pos.z > (dataCube.targetPos.z - 0.1f)) && (dataCube.rb.pos.z < (dataCube.targetPos.z + 0.1f)))
+				{
+					dataCube.rb.velocity = vec3(0.0f);
+					dataCube.rb.pos = dataCube.targetPos;
+				}
 			}
 		}
 	}

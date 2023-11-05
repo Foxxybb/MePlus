@@ -72,7 +72,7 @@ Screen screen;
 
 MyMalloc myMalloc;
 
-Data testData;
+//Data testData;
 
 // list of dataCubes that need to be moved around
 //list<Data> dataCubes;
@@ -127,14 +127,14 @@ int main() {
     // MODELS=====================================================================
 
     // fill dataCube list
-    myMalloc.dataCubes.push_back(testData);
+    //myMalloc.dataCubes.push_back(testData);
 
     // initialize each cube in the dataCubes list
-    for (Data &dataCube : myMalloc.dataCubes) {
+    /*for (Data &dataCube : myMalloc.dataCubes) {
         dataCube.init();
         dataCube.size = vec3(0.7f);
-        dataCube.rb.pos = vec3(0.0f, 3.0f, 0.0f);
-    }
+        dataCube.rb.pos = myMalloc.spawnPos;
+    }*/
 
     // data cube
     //Data testData;
@@ -221,29 +221,7 @@ int main() {
         dirLight.render(shader);
 
         // POSITION CHECK ==================================================================================================
-        // check for position of testdata, check a range to prevent overshooting   
-        // check range for x,y,z of position
-        // if range is within 0.1f if target, snap to target position and set velocity to 0
-        /*if (testData.rb.pos != testData.targetPos) {
-            if ((testData.rb.pos.x > (testData.targetPos.x - 0.1f)) && (testData.rb.pos.x < (testData.targetPos.x + 0.1f))
-                && (testData.rb.pos.y > (testData.targetPos.y - 0.1f)) && (testData.rb.pos.y < (testData.targetPos.y + 0.1f))
-                && (testData.rb.pos.z > (testData.targetPos.z - 0.1f)) && (testData.rb.pos.z < (testData.targetPos.z + 0.1f)))
-            {
-                testData.rb.velocity = vec3(0.0f);
-                testData.rb.pos = testData.targetPos;
-            }
-        }*/
-        /*for (Data &dataCube : myMalloc.dataCubes) {
-            if (dataCube.rb.pos != dataCube.targetPos) {
-                if ((dataCube.rb.pos.x > (dataCube.targetPos.x - 0.1f)) && (dataCube.rb.pos.x < (dataCube.targetPos.x + 0.1f))
-                    && (dataCube.rb.pos.y > (dataCube.targetPos.y - 0.1f)) && (dataCube.rb.pos.y < (dataCube.targetPos.y + 0.1f))
-                    && (dataCube.rb.pos.z > (dataCube.targetPos.z - 0.1f)) && (dataCube.rb.pos.z < (dataCube.targetPos.z + 0.1f)))
-                {
-                    dataCube.rb.velocity = vec3(0.0f);
-                    dataCube.rb.pos = dataCube.targetPos;
-                }
-            }
-        }*/
+        
         myMalloc.positionCheck();
 
         // RENDER LIGHTS ===========================================
@@ -301,9 +279,12 @@ int main() {
         //myBlock.render(shader, dt);
         
         myStage.render(shader, dt);
-        //testData.render(shader, dt);
-        for (Data &dataCube : myMalloc.dataCubes) {
-            dataCube.render(shader,dt);
+        
+        // render all cubes held by myMalloc
+        for (vector<Data> dataBlock : myMalloc.dataBlocks) {
+            for (Data &dataCube : dataBlock) {
+                dataCube.render(shader, dt);
+            }
         }
 
         //for (auto dataCube : myMalloc.dataCubes) {
@@ -336,8 +317,10 @@ int main() {
     myStage.cleanup();
     //testData.cleanup();
 
-    for (Data dataCube : myMalloc.dataCubes) {
-        dataCube.cleanup();
+    for (vector<Data> dataBlock : myMalloc.dataBlocks) {
+        for (Data dataCube : dataBlock) {
+            dataCube.cleanup();
+        }
     }
 
     for (Lamp lamp : sentLamps) {
@@ -452,24 +435,20 @@ void processInput(double dt)
         myMalloc.alloc();
     }
 
-    // test dataMove
+    // test spawn
     if (Keyboard::keyWentDown(GLFW_KEY_C)) {
-        // get vector between current position and target
-        /*testData.targetPos = myMalloc.dataCubePos[0];
-        vec3 movementVector = myMalloc.dataCubePos[0] - testData.rb.pos;
-        testData.rb.velocity = movementVector;*/
-        for (Data &dataCube : myMalloc.dataCubes) {
-            dataCube.targetPos = myMalloc.dataCubePos[0];
-            dataCube.rb.velocity = myMalloc.dataCubePos[0] - dataCube.rb.pos;
-        }
+        // init vector of cubes
+        myMalloc.spawnCubes(3);
     }
 
+    // test move
     if (Keyboard::keyWentDown(GLFW_KEY_V)) {
         // get vector between current position and target
-        for (Data &dataCube : myMalloc.dataCubes) {
+        /*for (Data &dataCube : myMalloc.dataCubes) {
             dataCube.targetPos = myMalloc.dataCubePos[4];
             dataCube.rb.velocity = myMalloc.dataCubePos[4] - dataCube.rb.pos;
-        }
+        }*/
+        myMalloc.moveCubes();
     }
 
     // camera look
