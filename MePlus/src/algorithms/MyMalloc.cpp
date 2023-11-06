@@ -10,9 +10,35 @@ MyMalloc::MyMalloc() {
 
 }
 
+// main script to run endlessly
+// performs a basic memory allocation algorithm
+// uses cubes as a visual representation of the process
+void MyMalloc::autoAlloc() {
+
+	// GET RANDOM INTS TO PLACE =================================
+	// generate a random int 1-4 as data block size
+	int dataSize = rand() % 4 + 1;
+	// generate a random int 0-7 as index to place data in
+	int dataIdx = rand() % 8;
+	cout << dataSize << " : " << dataIdx << endl;
+
+	// SPAWN CUBES TO REPRESENT INTS ============================
+	spawnCubes(dataSize);
+
+	// MOVE CUBES TO POSITION ===================================
+	moveCubes(dataIdx);
+
+	// once cubes have arrived, they need to perform the next step
+	// wait for cubes to arrive without stopping render and deadlocking
+	// try to use multithreading for this
+	while (cubesAreMoving) {
+		// wait until cubes are positioned
+		// this should deadlock the program until it is multithreaded
+	}
+}
+
 // generate a data block to be inserted into the memArray
 void MyMalloc::alloc() {
-	//cout << "Hello from MyMalloc" << endl;
 
 	// generate a random int 1-4 as data block size
 	int dataSize = rand() % 4 + 1;
@@ -21,9 +47,6 @@ void MyMalloc::alloc() {
 	int dataIdx = rand() % 8;
 
 	cout << dataSize << " : " << dataIdx << endl;
-
-	// test function with single int placements
-	//placeSingle(dataSize, dataIdx);
 
 	placeDataBlock(dataSize, dataIdx);
 
@@ -149,73 +172,76 @@ void MyMalloc::spawnCubes(int size) {
 		Data newData;
 		newData.init();
 		newData.size = vec3(0.7f);
-		//newData.rb.pos = spawnPos;
-		newData.rb.pos = dataCubeRaisedPos[i];
+		newData.rb.pos = spawnPos;
+		newData.targetPos = newData.rb.pos;
 		newVector.push_back(newData);
 	}
 
 	dataBlocks.push_back(newVector);
-	//currentDataBlock = newVector;
-	//return newVector;
 }
 
 // updates the target position for the currentDataBlock cubes
-void MyMalloc::moveCubes() {
+void MyMalloc::moveCubes(int cubeIdx) {
 
 	// for each cube in the current data block, assign the target position, and set velocity
 	// the target position is determined by each available index in the Memory Array
 	// dataCubeRaisedPos[availableIndex]
+	
+	// generate a random int 0-7 as index to place data in
+	//int cubeIdx = rand() % 8;
+
 	// get list of available indices
-	vector<int> targetSpace = spaceAvailable(3, 0);
+	// use current size of dataBlocks.back()
+	vector<int> targetSpace = spaceAvailable(dataBlocks.back().size(), cubeIdx);
 
 	for (auto it = targetSpace.begin(); it !=
 		targetSpace.end(); ++it)
 		cout << ' ' << *it;
 	cout << endl;
-
-	// test movement with direct reference to dataBlocks
-	for (vector<Data> &dataBlock : dataBlocks) {
-		for (Data &dataCube : dataBlock) {
-			dataCube.targetPos = spawnPos;
-			dataCube.rb.velocity = spawnPos - dataCube.rb.pos;
-		}
-	}
-
-	// this doesn't work, possibly due to reference issue?
-	/*int i = 0;
-	for (Data &dataCube : currentDataBlock) {
+	
+	// currentDataBlock is accessed with dataBlocks.back()
+	// use targetSpace to assign target positions for each cube
+	int i = 0;
+	for (Data &dataCube : dataBlocks.back()) {
 		dataCube.targetPos = dataCubeRaisedPos[targetSpace[i]];
 		dataCube.rb.velocity = dataCube.targetPos - dataCube.rb.pos;
 		i++;
-	}*/
+	}
+	cubesAreMoving = true;
+
+}
+
+// lower all cubes in the currentDataBlock to the "allocated" position
+void MyMalloc::placeCubes() {
+	for (Data& dataCube : dataBlocks.back()) {
+		dataCube.targetPos = vec3(dataCube.rb.pos.x, dataCube.rb.pos.y - 2, dataCube.rb.pos.z);
+		dataCube.rb.velocity = dataCube.targetPos - dataCube.rb.pos;
+	}
 }
 
 // for each dataCube, check if the dataCube is at its target position (within 0.1f range)
 // if so, snap the dataCube to the target position and set velocity to 0
 void MyMalloc::positionCheck() {
 
-	/*for (Data &dataCube : dataCubes) {
-		if (dataCube.rb.pos != dataCube.targetPos) {
-			if ((dataCube.rb.pos.x > (dataCube.targetPos.x - 0.1f)) && (dataCube.rb.pos.x < (dataCube.targetPos.x + 0.1f))
-				&& (dataCube.rb.pos.y > (dataCube.targetPos.y - 0.1f)) && (dataCube.rb.pos.y < (dataCube.targetPos.y + 0.1f))
-				&& (dataCube.rb.pos.z > (dataCube.targetPos.z - 0.1f)) && (dataCube.rb.pos.z < (dataCube.targetPos.z + 0.1f)))
-			{
-				dataCube.rb.velocity = vec3(0.0f);
-				dataCube.rb.pos = dataCube.targetPos;
-			}
-		}
-	}*/
-
 	// position check now occurs for every cube in the 2D vector: dataBlocks
 	for (vector<Data> &dataBlock : dataBlocks) {
 		for (Data &dataCube : dataBlock) {
 			if (dataCube.rb.pos != dataCube.targetPos) {
+
+				cubesAreMoving = true;
+				cout << "Cubes are moving..." << endl;
+
+				// if a cube is at target position, snap
 				if ((dataCube.rb.pos.x > (dataCube.targetPos.x - 0.1f)) && (dataCube.rb.pos.x < (dataCube.targetPos.x + 0.1f))
 					&& (dataCube.rb.pos.y > (dataCube.targetPos.y - 0.1f)) && (dataCube.rb.pos.y < (dataCube.targetPos.y + 0.1f))
 					&& (dataCube.rb.pos.z > (dataCube.targetPos.z - 0.1f)) && (dataCube.rb.pos.z < (dataCube.targetPos.z + 0.1f)))
 				{
 					dataCube.rb.velocity = vec3(0.0f);
 					dataCube.rb.pos = dataCube.targetPos;
+					cubesAreMoving = false;
+				}
+				else {
+					
 				}
 			}
 		}

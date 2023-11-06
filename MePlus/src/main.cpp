@@ -287,18 +287,9 @@ int main() {
             }
         }
 
-        //for (auto dataCube : myMalloc.dataCubes) {
-        //    //dataCube.render(shader, dt);
-        //}
-
         lampShader.activate();
         lampShader.setMat4("view", view);
         lampShader.setMat4("projection", projection);
-        //lamp.render(lampShader);
-        /*for (int i = 0; i < 4; i++) {
-            lamps[i].render(lampShader, dt);
-        }*/
-        //testLamp.render(lampShader, dt);
 
         // RENDER SENTLAMPS
         for (Lamp &lamp : sentLamps) {
@@ -382,10 +373,6 @@ void sendLamp(float dt) {
     newLamp.rb.applyImpulse(vec3(-1.0f, 0.0f, 0.0f), 500.0f, dt);
     sentLamps.push_back(newLamp);
     numPointLights++; // update number of point lights for shader
-
-    // sleep, then call another lamp
-    //this_thread::sleep_for(3000ms);
-    //sendLamp(dt);
 }
 
 void processInput(double dt)
@@ -444,7 +431,21 @@ void processInput(double dt)
     // test move
     if (Keyboard::keyWentDown(GLFW_KEY_V)) {
         
-        myMalloc.moveCubes();
+        myMalloc.moveCubes(0);
+    }
+
+    // test place
+    if (Keyboard::keyWentDown(GLFW_KEY_B)) {
+
+        myMalloc.placeCubes();
+    }
+
+    // test main script
+    if (Keyboard::keyWentDown(GLFW_KEY_G)) {
+
+        // start a new thread with allocation script
+        // example: thread (sendLamp, dt).detach();
+        //thread (myMalloc.autoAlloc).detach();
     }
 
     // camera look
@@ -460,4 +461,3 @@ void processInput(double dt)
     }
 
 }
-
