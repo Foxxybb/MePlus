@@ -10,6 +10,16 @@ MyMalloc::MyMalloc() {
 
 }
 
+void MyMalloc::nextAllocStep(int command) {
+	
+	switch (command) {
+	case ROTATE:
+		rotateCubes();
+	default:
+		break;
+	}
+}
+
 // spawn random number of cubes and set them at random starting index
 void MyMalloc::spawnAndSet() {
 

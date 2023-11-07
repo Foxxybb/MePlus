@@ -15,7 +15,7 @@ public:
 
     unsigned int allocStage = 0;
 
-    enum allocCommand { rotate = 0 };
+    enum allocCommand { ROTATE = 0 };
 
     bool cubesAreMoving = false; // used to check if all cubes have reached target position so next step in algorithm can start
 
@@ -47,6 +47,8 @@ public:
 
 	// constructor
 	MyMalloc();
+
+    void nextAllocStep(int command);
 
     void spawnAndSet(); // main script
 	

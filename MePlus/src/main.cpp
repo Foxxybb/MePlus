@@ -215,16 +215,17 @@ int main() {
         if (!allocThreadActive) {
 
             // insert a new function here that uses switch statement to automate cubes
+            myMalloc.nextAllocStep(myMalloc.ROTATE);
 
             // switch statement to fire the appropriate function
-            switch (myMalloc.rotate) {
-                case myMalloc.rotate :
+            /*switch (myMalloc.ROTATE) {
+                case myMalloc.ROTATE :
                     myMalloc.rotateCubes();
                 default:
                     break;
-            }
+            }*/
 
-            //myMalloc.autoAlloc();
+            // start reporting thread
             allocThreadActive = true;
             thread myThread(allocThread);
             myThread.detach();
