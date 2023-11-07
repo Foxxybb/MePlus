@@ -77,6 +77,9 @@ MyMalloc myMalloc;
 // list of dataCubes that need to be moved around
 //list<Data> dataCubes;
 
+bool allocThreadActive = true;
+
+void allocThread();
 GLenum glCheckError_(const char* file, int line);
 #define glCheckError() glCheckError_(__FILE__, __LINE__);
 
@@ -191,7 +194,7 @@ int main() {
     float lampTimer = 0.0f;
     float lampTimerIncrement = 2.0f;
 
-    // MAIN LOOP===============================================================================
+    // MAIN LOOP ===============================================================================
     while (!screen.shouldClose())
     {
         // calculate dt (deltaTime)
@@ -207,6 +210,25 @@ int main() {
         }
 
         processInput(dt);
+        // check for thread event
+        // if allocThread is not active, the cubes have reached their target positions
+        if (!allocThreadActive) {
+
+            // insert a new function here that uses switch statement to automate cubes
+
+            // switch statement to fire the appropriate function
+            switch (myMalloc.rotate) {
+                case myMalloc.rotate :
+                    myMalloc.rotateCubes();
+                default:
+                    break;
+            }
+
+            //myMalloc.autoAlloc();
+            allocThreadActive = true;
+            thread myThread(allocThread);
+            myThread.detach();
+        }
 
         // RENDER =========================
         screen.update();
@@ -442,10 +464,13 @@ void processInput(double dt)
 
     // test main script
     if (Keyboard::keyWentDown(GLFW_KEY_G)) {
+        
+        myMalloc.spawnAndSet();
 
-        // start a new thread with allocation script
-        // example: thread (sendLamp, dt).detach();
-        //thread (myMalloc.autoAlloc).detach();
+        // start thread alont side allocation script
+        allocThreadActive = true;
+        thread myThread(allocThread);
+        myThread.detach();
     }
 
     // camera look
@@ -459,5 +484,21 @@ void processInput(double dt)
     if (scrollDy != 0) {
         camera.defaultCamera.updateCameraZoom(scrollDy);
     }
+
+}
+
+// function to use as a detached thread to report when cubes having finished movement
+void allocThread() {
+
+    while (myMalloc.cubesAreMoving) {
+        //cout << "cubes moving" << endl;
+    }
+    // after cubes stop moving, do something else
+    cout << "cubes stopped" << endl;
+    
+    //myMalloc.autoAlloc();
+    // change a variable to trigger next step in automation
+    allocThreadActive = false;
+    //cout << allocThreadActive << endl;
 
 }

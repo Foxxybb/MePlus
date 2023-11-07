@@ -1,7 +1,7 @@
 #include "MyMalloc.h"
 
-#include <iostream>;
-#include <list>;
+#include <iostream>
+#include <thread>
 
 using namespace std;
 
@@ -10,10 +10,8 @@ MyMalloc::MyMalloc() {
 
 }
 
-// main script to run endlessly
-// performs a basic memory allocation algorithm
-// uses cubes as a visual representation of the process
-void MyMalloc::autoAlloc() {
+// spawn random number of cubes and set them at random starting index
+void MyMalloc::spawnAndSet() {
 
 	// GET RANDOM INTS TO PLACE =================================
 	// generate a random int 1-4 as data block size
@@ -25,16 +23,17 @@ void MyMalloc::autoAlloc() {
 	// SPAWN CUBES TO REPRESENT INTS ============================
 	spawnCubes(dataSize);
 
-	// MOVE CUBES TO POSITION ===================================
-	moveCubes(dataIdx);
+	// MOVE CUBES TO INITIAL POSITION ===================================
+	moveCubesToStartIdx(dataIdx);
 
 	// once cubes have arrived, they need to perform the next step
 	// wait for cubes to arrive without stopping render and deadlocking
 	// try to use multithreading for this
-	while (cubesAreMoving) {
+	//while (cubesAreMoving) {
 		// wait until cubes are positioned
 		// this should deadlock the program until it is multithreaded
-	}
+		//cout << "Cubes are moving..." << endl;
+	//}
 }
 
 // generate a data block to be inserted into the memArray
@@ -180,6 +179,40 @@ void MyMalloc::spawnCubes(int size) {
 	dataBlocks.push_back(newVector);
 }
 
+// move current data block to raised 0 index position
+void MyMalloc::moveCubesToStartIdx(int idx) {
+	// save index of current datablock
+	currentBlockIdx = idx;
+
+	int i = idx;
+	for (Data& dataCube : dataBlocks.back()) {
+		dataCube.targetPos = dataCubeRaisedPos[i];
+		dataCube.rb.velocity = dataCube.targetPos - dataCube.rb.pos;
+		i++;
+		if (i>7) { i = 0; }
+	}
+	cubesAreMoving = true;
+}
+
+// bump the index of the current datablock by 1, rotating around the visible array
+void MyMalloc::rotateCubes() {
+
+	currentBlockIdx++;
+	if (currentBlockIdx > 7) { currentBlockIdx = 0; }
+
+	int i = currentBlockIdx;
+
+	for (Data& dataCube : dataBlocks.back()) {
+
+		dataCube.targetPos = dataCubeRaisedPos[i];
+		dataCube.rb.velocity = dataCube.targetPos - dataCube.rb.pos;
+		i++;
+		if (i > 7) { i = 0; }
+	}
+	cubesAreMoving = true;
+
+}
+
 // updates the target position for the currentDataBlock cubes
 void MyMalloc::moveCubes(int cubeIdx) {
 
@@ -229,7 +262,7 @@ void MyMalloc::positionCheck() {
 			if (dataCube.rb.pos != dataCube.targetPos) {
 
 				cubesAreMoving = true;
-				cout << "Cubes are moving..." << endl;
+				//cout << "Cubes are moving..." << endl;
 
 				// if a cube is at target position, snap
 				if ((dataCube.rb.pos.x > (dataCube.targetPos.x - 0.1f)) && (dataCube.rb.pos.x < (dataCube.targetPos.x + 0.1f))
