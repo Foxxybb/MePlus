@@ -10,12 +10,16 @@ class MyMalloc
 {
 public:
 	unsigned int memArr[8]; // memory array that is represented by data cubes
+    unsigned int rootIdx = 0; // used to mark the start of the memArr search
+    unsigned int currentIdx = 0; // used to track location of current datablock
+    unsigned int currentSize = 0; // used to track current data block size
+    vector<int> currentSpace; // current available space at the current index
+
     vector<vector<Data>> dataBlocks; // vector of vectors that represent each datablock of size 1-4
-    unsigned int currentBlockIdx; // used to track location of current datablock
 
     unsigned int allocStage = 0;
 
-    enum allocCommand { ROTATE = 0 };
+    enum allocCommand { CHECK = 0 , ROTATE = 1 , PLACE = 2 };
 
     bool cubesAreMoving = false; // used to check if all cubes have reached target position so next step in algorithm can start
 
@@ -50,7 +54,9 @@ public:
 
     void nextAllocStep(int command);
 
-    void spawnAndSet(); // main script
+    void spawnAndSet(); // spawns new set of cubes at random index
+
+    void checkSpace(); // check if current index has space for current data block
 	
 	void alloc(); // generate a data block to be inserted into the memArray
 

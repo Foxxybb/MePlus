@@ -15,35 +15,140 @@ void MyMalloc::nextAllocStep(int command) {
 	switch (command) {
 	case ROTATE:
 		rotateCubes();
+		break;
+	case CHECK:
+		checkSpace();
+		break;
+	case PLACE:
+		placeCubes();
+		break;
 	default:
 		break;
 	}
+
+	cout << "currentSpace: ";
+	for (auto it = currentSpace.begin(); it !=
+		currentSpace.end(); ++it)
+		cout << ' ' << *it;
+	cout << endl;
 }
+
+// ALLOC STEP FUNCTIONS =======================================================================
 
 // spawn random number of cubes and set them at random starting index
 void MyMalloc::spawnAndSet() {
 
 	// GET RANDOM INTS TO PLACE =================================
 	// generate a random int 1-4 as data block size
-	int dataSize = rand() % 4 + 1;
+	currentSize = rand() % 4 + 1;
 	// generate a random int 0-7 as index to place data in
-	int dataIdx = rand() % 8;
-	cout << dataSize << " : " << dataIdx << endl;
+	rootIdx = rand() % 8; // mark start of search
+	currentIdx = rootIdx;
+	cout << currentSize << " : " << rootIdx << endl;
 
 	// SPAWN CUBES TO REPRESENT INTS ============================
-	spawnCubes(dataSize);
+	spawnCubes(currentSize);
 
 	// MOVE CUBES TO INITIAL POSITION ===================================
-	moveCubesToStartIdx(dataIdx);
+	moveCubesToStartIdx(currentIdx);
 
-	// once cubes have arrived, they need to perform the next step
-	// wait for cubes to arrive without stopping render and deadlocking
-	// try to use multithreading for this
-	//while (cubesAreMoving) {
-		// wait until cubes are positioned
-		// this should deadlock the program until it is multithreaded
-		//cout << "Cubes are moving..." << endl;
-	//}
+}
+
+// update current space
+// current space returns empty if current block does not fit
+void MyMalloc::checkSpace() {
+	// based on input, make list of indices to check if they are empty (0)
+	vector<int> idxList;
+	idxList.push_back(currentIdx);
+
+	// add all indices that datablock should occupy
+	for (int i = 1; i < currentSize; i++) {
+		// if index exceeds 7, then subtract by 8 to loop to 0
+		if ((currentIdx + i) > 7) {
+			idxList.push_back(currentIdx + i - 8);
+		}
+		else {
+			idxList.push_back(currentIdx + i);
+		}
+	}
+
+	// finally, check memArr if indices are empty (0)
+	// if they are not all empty, return an empty list
+	for (int memIdx : idxList) {
+		if (memArr[memIdx] != 0) {
+			//return vector<int>{}; // return empty list if all space isn't fully available
+			currentSpace = vector<int>{};
+			return;
+		}
+	}
+
+	//return idxList;
+	currentSpace = idxList;
+}
+
+// bump the index of the current datablock by 1, rotating around the visible array
+void MyMalloc::rotateCubes() {
+
+	currentIdx++;
+	if (currentIdx > 7) { currentIdx = 0; }
+
+	int i = currentIdx;
+
+	for (Data& dataCube : dataBlocks.back()) {
+
+		dataCube.targetPos = dataCubeRaisedPos[i];
+		dataCube.rb.velocity = dataCube.targetPos - dataCube.rb.pos;
+		i++;
+		if (i > 7) { i = 0; }
+	}
+	cubesAreMoving = true;
+
+}
+
+// lower all cubes in the currentDataBlock to the "allocated" position
+// fill memory array with current block
+void MyMalloc::placeCubes() {
+	// place data block at current indices
+	for (int space : currentSpace) {
+		memArr[space] = currentSize;
+	}
+
+	for (Data &dataCube : dataBlocks.back()) {
+		dataCube.targetPos = vec3(dataCube.rb.pos.x, dataCube.rb.pos.y - 2, dataCube.rb.pos.z);
+		dataCube.rb.velocity = dataCube.targetPos - dataCube.rb.pos;
+	}
+}
+
+// =======================================================================================
+
+// returns list of indices that we are trying to occupy with the current data block
+// if indices are occupied, returns empty list
+vector<int> MyMalloc::spaceAvailable(int size, int idx) {
+
+	// based on input, make list of indices to check if they are empty (0)
+	vector<int> idxList;
+	idxList.push_back(idx);
+
+	// add all indices that datablock should occupy
+	for (int i = 1; i < size; i++) {
+		// if index exceeds 7, then subtract by 8 to loop to 0
+		if ((idx + i) > 7) {
+			idxList.push_back(idx + i - 8);
+		}
+		else {
+			idxList.push_back(idx + i);
+		}
+	}
+
+	// finally, check memArr if indices are empty (0)
+	// if they are not all empty, return an empty list
+	for (int memIdx : idxList) {
+		if (memArr[memIdx] != 0) {
+			return vector<int>{}; // return empty list if all space isn't fully available
+		}
+	}
+
+	return idxList;
 }
 
 // generate a data block to be inserted into the memArray
@@ -142,35 +247,7 @@ void MyMalloc::placeDataBlock(int size, int idx) {
 	}
 }
 
-// returns list of indices that we are trying to occupy with the current data block
-// if indices are occupied, returns empty list
-vector<int> MyMalloc::spaceAvailable(int size, int idx) {
 
-	// based on input, make list of indices to check if they are empty (0)
-	vector<int> idxList;
-	idxList.push_back(idx);
-
-	// add all indices that datablock should occupy
-	for (int i = 1; i < size; i++) {
-		// if index exceeds 7, then subtract by 8 to loop to 0
-		if ((idx + i) > 7) {
-			idxList.push_back(idx + i - 8);
-		}
-		else {
-			idxList.push_back(idx + i);
-		}
-	}
-
-	// finally, check memArr if indices are empty (0)
-	// if they are not all empty, return an empty list
-	for (int memIdx : idxList) {
-		if (memArr[memIdx] != 0) {
-			return vector<int>{}; // return empty list if all space isn't fully available
-		}
-	}
-
-	return idxList;
-}
 
 // spawn vector of cubes to represent the current datablock
 void MyMalloc::spawnCubes(int size) {
@@ -192,7 +269,7 @@ void MyMalloc::spawnCubes(int size) {
 // move current data block to raised 0 index position
 void MyMalloc::moveCubesToStartIdx(int idx) {
 	// save index of current datablock
-	currentBlockIdx = idx;
+	currentIdx = idx;
 
 	int i = idx;
 	for (Data& dataCube : dataBlocks.back()) {
@@ -204,24 +281,6 @@ void MyMalloc::moveCubesToStartIdx(int idx) {
 	cubesAreMoving = true;
 }
 
-// bump the index of the current datablock by 1, rotating around the visible array
-void MyMalloc::rotateCubes() {
-
-	currentBlockIdx++;
-	if (currentBlockIdx > 7) { currentBlockIdx = 0; }
-
-	int i = currentBlockIdx;
-
-	for (Data& dataCube : dataBlocks.back()) {
-
-		dataCube.targetPos = dataCubeRaisedPos[i];
-		dataCube.rb.velocity = dataCube.targetPos - dataCube.rb.pos;
-		i++;
-		if (i > 7) { i = 0; }
-	}
-	cubesAreMoving = true;
-
-}
 
 // updates the target position for the currentDataBlock cubes
 void MyMalloc::moveCubes(int cubeIdx) {
@@ -254,13 +313,7 @@ void MyMalloc::moveCubes(int cubeIdx) {
 
 }
 
-// lower all cubes in the currentDataBlock to the "allocated" position
-void MyMalloc::placeCubes() {
-	for (Data& dataCube : dataBlocks.back()) {
-		dataCube.targetPos = vec3(dataCube.rb.pos.x, dataCube.rb.pos.y - 2, dataCube.rb.pos.z);
-		dataCube.rb.velocity = dataCube.targetPos - dataCube.rb.pos;
-	}
-}
+
 
 // for each dataCube, check if the dataCube is at its target position (within 0.1f range)
 // if so, snap the dataCube to the target position and set velocity to 0
