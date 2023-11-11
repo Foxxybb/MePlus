@@ -488,11 +488,9 @@ void allocThread() {
         //cout << "cubes moving" << endl;
     }
     // after cubes stop moving, do something else
-    cout << "cubes stopped" << endl;
+    //cout << "cubes stopped" << endl;
     
-    //myMalloc.autoAlloc();
     // change a variable to trigger next step in automation
     allocThreadActive = false;
     //cout << allocThreadActive << endl;
-
 }

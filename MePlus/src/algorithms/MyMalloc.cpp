@@ -18,6 +18,24 @@ void MyMalloc::nextAllocStep(int command) {
 		break;
 	case CHECK:
 		checkSpace();
+
+		// if current space is not empty, place cubes
+		// else, rotate
+		if (!currentSpace.empty()) {
+			placeCubes();
+			spawnAndSet();
+		}
+		else {
+			// check if full rotation has been made by counting rotates
+			if (rotateCount == 8) {
+				cout << "Full rotation made" << endl;
+				resetMalloc();
+				placeCubes();
+				spawnAndSet();
+			}
+			rotateCubes();
+
+		}
 		break;
 	case PLACE:
 		placeCubes();
@@ -25,19 +43,45 @@ void MyMalloc::nextAllocStep(int command) {
 	default:
 		break;
 	}
-
-	cout << "currentSpace: ";
-	for (auto it = currentSpace.begin(); it !=
-		currentSpace.end(); ++it)
-		cout << ' ' << *it;
-	cout << endl;
+	
 }
 
 // ALLOC STEP FUNCTIONS =======================================================================
 
+void MyMalloc::resetMalloc() {
+	// lower all cubes
+	for (vector<Data> &dataBlock : dataBlocks) {
+		for (Data &dataCube : dataBlock) {
+			dataCube.targetPos = vec3(dataCube.rb.pos.x, dataCube.rb.pos.y - 3, dataCube.rb.pos.z);
+			dataCube.rb.velocity = dataCube.targetPos - dataCube.rb.pos;
+		}
+	}
+	// set target position of current cubes to previous position (don't move)
+	for (Data &dataCube : dataBlocks.back()) {
+		dataCube.targetPos = vec3(dataCube.targetPos.x, dataCube.targetPos.y + 3, dataCube.targetPos.z);
+		dataCube.rb.velocity = vec3(0);
+	}
+
+	// reset memArr
+	for (int i = 0; i < 8; i++) {
+		memArr[i] = 0;
+	}
+
+	// set current block in memArr
+	for (int i = 0; i < currentSize; i++) {
+		if ((currentIdx + i) > 7) {
+			memArr[currentIdx + i - 8] = currentSize;
+		}
+		else {
+			memArr[currentIdx + i] = currentSize;
+		}
+	}
+
+}
+
 // spawn random number of cubes and set them at random starting index
 void MyMalloc::spawnAndSet() {
-
+	rotateCount = 0;
 	// GET RANDOM INTS TO PLACE =================================
 	// generate a random int 1-4 as data block size
 	currentSize = rand() % 4 + 1;
@@ -84,10 +128,17 @@ void MyMalloc::checkSpace() {
 
 	//return idxList;
 	currentSpace = idxList;
+
+	cout << "currentSpace: ";
+	for (auto it = currentSpace.begin(); it !=
+		currentSpace.end(); ++it)
+		cout << ' ' << *it;
+	cout << endl;
 }
 
 // bump the index of the current datablock by 1, rotating around the visible array
 void MyMalloc::rotateCubes() {
+	rotateCount++;
 
 	currentIdx++;
 	if (currentIdx > 7) { currentIdx = 0; }
@@ -97,7 +148,9 @@ void MyMalloc::rotateCubes() {
 	for (Data& dataCube : dataBlocks.back()) {
 
 		dataCube.targetPos = dataCubeRaisedPos[i];
-		dataCube.rb.velocity = dataCube.targetPos - dataCube.rb.pos;
+		vec3 newVel = (dataCube.targetPos - dataCube.rb.pos) * vec3(2); 
+		//dataCube.rb.velocity = (dataCube.targetPos - dataCube.rb.pos);
+		dataCube.rb.velocity = newVel;
 		i++;
 		if (i > 7) { i = 0; }
 	}
@@ -114,9 +167,18 @@ void MyMalloc::placeCubes() {
 	}
 
 	for (Data &dataCube : dataBlocks.back()) {
-		dataCube.targetPos = vec3(dataCube.rb.pos.x, dataCube.rb.pos.y - 2, dataCube.rb.pos.z);
+		dataCube.targetPos = vec3(dataCube.rb.pos.x, dataCube.rb.pos.y - 3, dataCube.rb.pos.z);
 		dataCube.rb.velocity = dataCube.targetPos - dataCube.rb.pos;
 	}
+
+	// print memArr
+	for (int i = 0; i < 8; i++) {
+		cout << memArr[i] << ",";
+	}
+	cout << endl;
+
+	currentSpace = vector<int> {};
+	cubesAreMoving = true;
 }
 
 // =======================================================================================

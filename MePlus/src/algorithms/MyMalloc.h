@@ -11,6 +11,7 @@ class MyMalloc
 public:
 	unsigned int memArr[8]; // memory array that is represented by data cubes
     unsigned int rootIdx = 0; // used to mark the start of the memArr search
+    unsigned int rotateCount = 0; // used to check if full rotation has been made
     unsigned int currentIdx = 0; // used to track location of current datablock
     unsigned int currentSize = 0; // used to track current data block size
     vector<int> currentSpace; // current available space at the current index
@@ -53,6 +54,8 @@ public:
 	MyMalloc();
 
     void nextAllocStep(int command);
+
+    void resetMalloc();
 
     void spawnAndSet(); // spawns new set of cubes at random index
 
