@@ -8,6 +8,12 @@ class Screen {
 public:
 	static unsigned int SCR_WIDTH;
 	static unsigned int SCR_HEIGHT;
+	static Screen instance; // singleton
+
+	// colors used for background
+	float r = 0.0f;
+	float g = 0.2f;
+	float b = 0.2f;
 
 	static void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
@@ -16,6 +22,8 @@ public:
 	bool init();
 
 	void setParameters();
+
+	void slideBackgroundColors();
 
 	// mainloop
 	void update();

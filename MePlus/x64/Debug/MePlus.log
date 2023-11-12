@@ -1,6 +1,5 @@
 ﻿  MyMalloc.cpp
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\algorithms\MyMalloc.cpp(71,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\algorithms\MyMalloc.cpp(109,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\algorithms\MyMalloc.cpp(359,65): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-LINK : warning LNK4098: defaultlib 'MSVCRT' conflicts with use of other libs; use /NODEFAULTLIB:library
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\algorithms\MyMalloc.cpp(73,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\algorithms\MyMalloc.cpp(113,20): warning C4018: '<': signed/unsigned mismatch
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\algorithms\MyMalloc.cpp(363,65): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
   MePlus.vcxproj -> C:\Users\leetl\Documents\GitHub\MePlus\x64\Debug\MePlus.exe

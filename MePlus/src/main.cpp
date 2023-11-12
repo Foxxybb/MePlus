@@ -69,6 +69,7 @@ vector<Lamp> sentLamps;
 unsigned int numPointLights = 1;
 
 Screen screen;
+Screen Screen::instance = screen;
 
 MyMalloc myMalloc;
 
@@ -169,19 +170,6 @@ int main() {
         glm::vec4(0.0f, 0.0f, 0.0f, 1.0f), glm::vec4(1.0f), glm::vec4(1.0f)
     };
 
-    // MY STUFF =========================================================================
-    // set pointLight (myLamp) at center of world
-    //Lamp testLamp;
-    //testLamp = Lamp(vec3(1.0f, 1.0f, 1.0f), // light color
-    //    vec4(0.05f, 0.05f, 0.05f, 1.0f), // ambi
-    //    vec4(0.8f, 0.8f, 0.8f, 1.0f),  // diff
-    //    vec4(1.0f, 1.0f, 1.0f, 1.0f), // spec
-    //    1.0f, 0.07f, 0.032f, // light strength?
-    //    vec3(4.0f, 4.0f, 4.0f), // position
-    //    vec3(0.1f) // size
-    //);
-    //testLamp.init();
-
     camera.defaultCamera.updateCameraDirection(0.0f, -30.0f); // looking down at the stage
 
     // ERROR CHECK
@@ -192,7 +180,7 @@ int main() {
     //auto three_seconds = 3s;
     //thread (sendLamp, dt).detach();
     float lampTimer = 0.0f;
-    float lampTimerIncrement = 2.0f;
+    float lampTimerIncrement = 1.5f;
 
     // MAIN LOOP ===============================================================================
     while (!screen.shouldClose())
@@ -210,13 +198,52 @@ int main() {
         }
 
         processInput(dt);
+
         // check for thread event
         // if allocThread is not active, the cubes have reached their target positions
         if (!allocThreadActive) {
 
             // insert a new function here that uses switch statement to automate cubes
-            myMalloc.nextAllocStep(myMalloc.CHECK);
+            //myMalloc.nextAllocStep(myMalloc.CHECK);
 
+            myMalloc.checkSpace();
+
+            // if current space is not empty, place cubes
+            // else, rotate
+            //if (!myMalloc.currentSpace.empty()) {
+            //    myMalloc.placeCubes();
+            //    myMalloc.spawnAndSet();
+            //    screen.slideBackgroundColors();
+            //}
+            //else {
+            //    // check if full rotation has been made by counting rotates
+            //    if (myMalloc.rotateCount == 8) {
+            //        cout << "Full rotation made" << endl;
+            //        myMalloc.resetMalloc();
+            //        myMalloc.placeCubes();
+            //        myMalloc.spawnAndSet();
+            //        screen.slideBackgroundColors();
+            //    }
+            //    myMalloc.rotateCubes();
+            //}
+
+            if (myMalloc.resetting) {
+                myMalloc.spawnAndSet();
+            }
+            else if (!myMalloc.currentSpace.empty()) {
+                    myMalloc.placeCubes();
+                    myMalloc.spawnAndSet();
+                    screen.slideBackgroundColors();
+                }
+            else if (myMalloc.rotateCount == 8) {
+                cout << "Full rotation made" << endl;
+                myMalloc.resetMalloc();
+                myMalloc.placeCubes();
+                screen.slideBackgroundColors();
+            }
+            else {
+                myMalloc.rotateCubes();
+            }
 
             // start reporting thread
             allocThreadActive = true;
@@ -438,22 +465,10 @@ void processInput(double dt)
         myMalloc.alloc();
     }
 
-    // test spawn
+    // test background colors
     if (Keyboard::keyWentDown(GLFW_KEY_C)) {
-        // init vector of cubes
-        myMalloc.spawnCubes(3);
-    }
-
-    // test move
-    if (Keyboard::keyWentDown(GLFW_KEY_V)) {
         
-        myMalloc.moveCubes(0);
-    }
-
-    // test place
-    if (Keyboard::keyWentDown(GLFW_KEY_B)) {
-
-        myMalloc.placeCubes();
+        screen.slideBackgroundColors();
     }
 
     // test main script
@@ -461,7 +476,7 @@ void processInput(double dt)
         
         myMalloc.spawnAndSet();
 
-        // start thread alont side allocation script
+        // start thread along side allocation script
         allocThreadActive = true;
         thread myThread(allocThread);
         myThread.detach();

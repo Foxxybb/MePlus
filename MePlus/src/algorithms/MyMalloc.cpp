@@ -1,7 +1,8 @@
-#include "MyMalloc.h"
 
 #include <iostream>
 #include <thread>
+
+#include "MyMalloc.h"
 
 using namespace std;
 
@@ -24,6 +25,7 @@ void MyMalloc::nextAllocStep(int command) {
 		if (!currentSpace.empty()) {
 			placeCubes();
 			spawnAndSet();
+			
 		}
 		else {
 			// check if full rotation has been made by counting rotates
@@ -76,12 +78,12 @@ void MyMalloc::resetMalloc() {
 			memArr[currentIdx + i] = currentSize;
 		}
 	}
-
+	rotateCount = 0;
+	resetting = true;
 }
 
 // spawn random number of cubes and set them at random starting index
 void MyMalloc::spawnAndSet() {
-	rotateCount = 0;
 	// GET RANDOM INTS TO PLACE =================================
 	// generate a random int 1-4 as data block size
 	currentSize = rand() % 4 + 1;
@@ -96,6 +98,8 @@ void MyMalloc::spawnAndSet() {
 	// MOVE CUBES TO INITIAL POSITION ===================================
 	moveCubesToStartIdx(currentIdx);
 
+	resetting = false;
+	rotateCount = 0;
 }
 
 // update current space
@@ -382,8 +386,8 @@ void MyMalloc::moveCubes(int cubeIdx) {
 void MyMalloc::positionCheck() {
 
 	// position check now occurs for every cube in the 2D vector: dataBlocks
-	for (vector<Data> &dataBlock : dataBlocks) {
-		for (Data &dataCube : dataBlock) {
+	for (vector<Data>& dataBlock : dataBlocks) {
+		for (Data& dataCube : dataBlock) {
 			if (dataCube.rb.pos != dataCube.targetPos) {
 
 				cubesAreMoving = true;
@@ -399,9 +403,20 @@ void MyMalloc::positionCheck() {
 					cubesAreMoving = false;
 				}
 				else {
-					
+
 				}
 			}
 		}
 	}
+
+	// check all cube velocities
+	for (vector<Data> &dataBlock : dataBlocks) {
+		for (Data &dataCube : dataBlock) {
+			if (dataCube.rb.velocity != vec3(0.0f)) {
+				cubesAreMoving = true;
+				return;
+			}
+		}
+	}
+	cubesAreMoving = false;
 }

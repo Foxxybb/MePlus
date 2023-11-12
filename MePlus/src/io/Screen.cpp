@@ -46,8 +46,22 @@ void Screen::setParameters() {
 }
 
 void Screen::update() {
-	glClearColor(0.2f,0.3f,0.3f,1.0f);
+	// restore colors gradually when changed
+	if (b > 0.2f) {
+		b -= 0.01f;
+	}
+	if (g > 0.2f) {
+		g -= 0.01f;
+	}
+
+	//glClearColor(0.2f,0.3f,0.3f,1.0f); //gray
+	glClearColor(r, b, g, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+void Screen::slideBackgroundColors() {
+	b = 0.5f;
+	g = 0.5f;
 }
 
 void Screen::newFrame() {

@@ -15,6 +15,7 @@ public:
     unsigned int currentIdx = 0; // used to track location of current datablock
     unsigned int currentSize = 0; // used to track current data block size
     vector<int> currentSpace; // current available space at the current index
+    bool resetting; // bool to mark reset step for malloc
 
     vector<vector<Data>> dataBlocks; // vector of vectors that represent each datablock of size 1-4
 
