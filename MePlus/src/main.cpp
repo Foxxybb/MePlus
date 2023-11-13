@@ -202,39 +202,16 @@ int main() {
         // check for thread event
         // if allocThread is not active, the cubes have reached their target positions
         if (!allocThreadActive) {
-
-            // insert a new function here that uses switch statement to automate cubes
-            //myMalloc.nextAllocStep(myMalloc.CHECK);
-
             myMalloc.checkSpace();
-
-            // if current space is not empty, place cubes
-            // else, rotate
-            //if (!myMalloc.currentSpace.empty()) {
-            //    myMalloc.placeCubes();
-            //    myMalloc.spawnAndSet();
-            //    screen.slideBackgroundColors();
-            //}
-            //else {
-            //    // check if full rotation has been made by counting rotates
-            //    if (myMalloc.rotateCount == 8) {
-            //        cout << "Full rotation made" << endl;
-            //        myMalloc.resetMalloc();
-            //        myMalloc.placeCubes();
-            //        myMalloc.spawnAndSet();
-            //        screen.slideBackgroundColors();
-            //    }
-            //    myMalloc.rotateCubes();
-            //}
 
             if (myMalloc.resetting) {
                 myMalloc.spawnAndSet();
             }
             else if (!myMalloc.currentSpace.empty()) {
-                    myMalloc.placeCubes();
-                    myMalloc.spawnAndSet();
-                    screen.slideBackgroundColors();
-                }
+                myMalloc.placeCubes();
+                myMalloc.spawnAndSet();
+                screen.slideBackgroundColors();
+            }
             else if (myMalloc.rotateCount == 8) {
                 cout << "Full rotation made" << endl;
                 myMalloc.resetMalloc();
@@ -257,18 +234,17 @@ int main() {
         shader.activate();
         shader.set3Float("viewPos", camera.defaultCamera.cameraPos);
 
-        // rotating the dirLight test
-        dirLight.direction = glm::vec3(
-            glm::rotate(glm::mat4(1.0f), glm::radians(0.5f), glm::vec3(1.0f, 0.0f, 0.0f)) *
-            glm::vec4(dirLight.direction, 1.0f));
-        dirLight.render(shader);
-
         // POSITION CHECK ==================================================================================================
-        
+
         myMalloc.positionCheck();
 
         // RENDER LIGHTS ===========================================
-        //testLamp.pointLight.render(shader, 0);
+         
+         // rotating the dirLight
+        dirLight.direction = vec3(
+            rotate(mat4(1.0f), radians(0.5f), vec3(1.0f, 0.0f, 0.0f)) *
+            vec4(dirLight.direction, 1.0f));
+        dirLight.render(shader);
 
         for (int i = 0; i < sentLamps.size(); i++) {
             sentLamps[i].pointLight.render(shader, i);

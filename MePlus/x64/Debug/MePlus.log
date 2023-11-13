@@ -1,5 +1,11 @@
-﻿  MyMalloc.cpp
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\algorithms\MyMalloc.cpp(73,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\algorithms\MyMalloc.cpp(113,20): warning C4018: '<': signed/unsigned mismatch
-C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\algorithms\MyMalloc.cpp(363,65): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+﻿  main.cpp
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\graphics\models\cube.hpp(68,36): warning C4018: '<': signed/unsigned mismatch
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(92,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(190,26): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(191,21): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(254,54): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(95,10): warning C4101: 'infoLog': unreferenced local variable
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(94,9): warning C4101: 'success': unreferenced local variable
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(431,20): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+C:\Users\leetl\Documents\GitHub\MePlus\MePlus\src\main.cpp(436,18): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
   MePlus.vcxproj -> C:\Users\leetl\Documents\GitHub\MePlus\x64\Debug\MePlus.exe
